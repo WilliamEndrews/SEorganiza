@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { CATEGORIAS_FIXAS, LIMITE_CATEGORIAS_NOVAS } from '../constantes/dados';
@@ -9,7 +10,6 @@ import BolhaNovaCategoria from './BolhaNovaCategoria';
 export default function PainelOpcoes({
   escalaX,
   escalaY,
-  aoAbrirConfig,
   nomeUsuario,
   categorias,
   aoAdicionarCategoria,
@@ -51,7 +51,10 @@ export default function PainelOpcoes({
   const [bolhaNaTela, setBolhaNaTela] = useState(false);
   const [nomeNovo, setNomeNovo] = useState('');
   const [avisoBolha, setAvisoBolha] = useState('');
-  const aparecerBolha = useRef(new Animated.Value(0)).current;
+  // A função dentro do useState faz o Animated.Value ser criado uma vez só.
+  const [aparecerBolha] = useState(function () {
+    return new Animated.Value(0);
+  });
 
   function abrirBolha() {
     if (!podeAdicionar) return;
@@ -87,7 +90,7 @@ export default function PainelOpcoes({
       return;
     }
     const jaExiste = categorias.some(function (categoria) {
-      return categoria.toLowerCase() === limpo.toLowerCase();
+      return categoria.nome.toLowerCase() === limpo.toLowerCase();
     });
     if (jaExiste) {
       setAvisoBolha('Essa categoria já existe');
@@ -143,18 +146,33 @@ export default function PainelOpcoes({
         Categorias
       </Text>
 
+      {/* Cada categoria abre a rota /categoria/[id]. A área de toque começa 6 acima
+          do texto e tem 34 de altura, para não encostar na categoria vizinha. */}
       {categorias.map(function (categoria, indice) {
         const topo = topoCategoria(indice);
         return (
-          <View key={categoria}>
-            <Text style={[styles.traco, { left: x(21), top: y(topo), fontSize: y(18) }]}>—</Text>
-            <Text
-              numberOfLines={1}
-              style={[styles.textoItem, { left: x(55), top: y(topo), width: x(210), fontSize: y(16) }]}
+          <Link
+            key={categoria.id}
+            href={{ pathname: '/categoria/[id]', params: { id: categoria.id } }}
+            asChild
+          >
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={categoria.nome}
+              style={StyleSheet.flatten([
+                styles.linhaLink,
+                { top: y(topo - 6), width: x(270), height: y(34) },
+              ])}
             >
-              {categoria}
-            </Text>
-          </View>
+              <Text style={[styles.traco, { left: x(21), top: y(6), fontSize: y(18) }]}>—</Text>
+              <Text
+                numberOfLines={1}
+                style={[styles.textoItem, { left: x(55), top: y(6), width: x(210), fontSize: y(16) }]}
+              >
+                {categoria.nome}
+              </Text>
+            </Pressable>
+          </Link>
         );
       })}
 
@@ -182,43 +200,69 @@ export default function PainelOpcoes({
 
       <View style={[styles.divisor, { left: x(5), top: y(topoDivisor2), width: x(277) }]} />
 
-      <Pressable
-        onPress={aoAbrirConfig}
-        accessibilityRole="button"
-        accessibilityLabel="Configurações"
-        style={[
-          styles.linhaMenu,
-          { left: x(8), top: y(topoConfig), width: x(270), height: y(48) },
-        ]}
-      >
-        <Ionicons name="settings-outline" size={x(26)} color="#1C1C1C" />
-        <Text
-          style={[
-            styles.textoItem,
-            { position: 'relative', fontSize: y(18), marginLeft: x(12) },
-          ]}
+      {/* O Link com asChild não aceita uma lista de estilos no filho; o flatten junta
+          a lista num objeto só. */}
+      <Link href="/configuracoes" asChild>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Configurações"
+          style={StyleSheet.flatten([
+            styles.linhaMenu,
+            { left: x(8), top: y(topoConfig), width: x(270), height: y(48) },
+          ])}
         >
-          Configurações
-        </Text>
-      </Pressable>
-      <Ionicons
-        name="checkmark-circle-outline"
-        size={x(26)}
-        color="#1C1C1C"
-        style={{ position: 'absolute', left: x(19), top: y(topoConcluidas) }}
-      />
-      <Text style={[styles.textoItem, { left: x(57), top: y(topoConcluidas), fontSize: y(18) }]}>
-        Tarefas Concluídas
-      </Text>
-      <Ionicons
-        name="trash-outline"
-        size={x(24)}
-        color="#1C1C1C"
-        style={{ position: 'absolute', left: x(17), top: y(topoExcluidas) }}
-      />
-      <Text style={[styles.textoItem, { left: x(55), top: y(topoExcluidas), fontSize: y(18) }]}>
-        Tarefas Excluídas
-      </Text>
+          <Ionicons name="settings-outline" size={x(26)} color="#1C1C1C" />
+          <Text
+            style={[
+              styles.textoItem,
+              { position: 'relative', fontSize: y(18), marginLeft: x(12) },
+            ]}
+          >
+            Configurações
+          </Text>
+        </Pressable>
+      </Link>
+      {/* As duas linhas de tarefas: a área de toque começa 10 acima do ícone e tem 46. */}
+      <Link href="/tarefas/concluidas" asChild>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Tarefas Concluídas"
+          style={StyleSheet.flatten([
+            styles.linhaLink,
+            { top: y(topoConcluidas - 10), width: x(270), height: y(46) },
+          ])}
+        >
+          <Ionicons
+            name="checkmark-circle-outline"
+            size={x(26)}
+            color="#1C1C1C"
+            style={{ position: 'absolute', left: x(19), top: y(10) }}
+          />
+          <Text style={[styles.textoItem, { left: x(57), top: y(10), fontSize: y(18) }]}>
+            Tarefas Concluídas
+          </Text>
+        </Pressable>
+      </Link>
+      <Link href="/tarefas/excluidas" asChild>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Tarefas Excluídas"
+          style={StyleSheet.flatten([
+            styles.linhaLink,
+            { top: y(topoExcluidas - 10), width: x(270), height: y(46) },
+          ])}
+        >
+          <Ionicons
+            name="trash-outline"
+            size={x(24)}
+            color="#1C1C1C"
+            style={{ position: 'absolute', left: x(17), top: y(10) }}
+          />
+          <Text style={[styles.textoItem, { left: x(55), top: y(10), fontSize: y(18) }]}>
+            Tarefas Excluídas
+          </Text>
+        </Pressable>
+      </Link>
 
       {bolhaNaTela ? (
         <BolhaNovaCategoria
@@ -274,5 +318,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingLeft: 9,
+  },
+  // Linha que leva a uma rota. Os filhos continuam com posição absoluta, agora
+  // medida a partir do topo da linha.
+  linhaLink: {
+    position: 'absolute',
+    left: 0,
   },
 });

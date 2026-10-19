@@ -29,12 +29,10 @@ export default function GrupoVidro({ cor, style, children }) {
   const azul = cor === 'azul';
   // Translúcido: as duas cores do degradê ganham transparência, e o painel escuro
   // aparece por trás. Para ajustar, mude só OPACIDADE_VIDRO (em src/constantes/figma.js).
-  const coresBase = (azul ? DEGRADE_AZUL : DEGRADE_LARANJA).map(function (hex) {
-    return hexComAlfa(hex, OPACIDADE_VIDRO);
-  });
+  const degrade = azul ? DEGRADE_AZUL : DEGRADE_LARANJA;
   return (
     <LinearGradient
-      colors={coresBase}
+      colors={[hexComAlfa(degrade[0], OPACIDADE_VIDRO), hexComAlfa(degrade[1], OPACIDADE_VIDRO)]}
       start={azul ? DEGRADE_AZUL_INICIO : DEGRADE_LARANJA_INICIO}
       end={azul ? DEGRADE_AZUL_FIM : DEGRADE_LARANJA_FIM}
       style={style}
@@ -59,11 +57,11 @@ export default function GrupoVidro({ cor, style, children }) {
 
 const styles = StyleSheet.create({
   camadaVidro: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   // Borda de luz: clara em cima e à esquerda (de onde vem a luz), escura embaixo e à direita.
   bordaVidro: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 13,
     borderWidth: 1.5,
     borderTopColor: 'rgba(255, 255, 255, 0.7)',

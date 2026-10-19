@@ -59,7 +59,7 @@ export default function PaginaDataHora({
         Nenhuma tela usa essas escolhas ainda. A agenda será a primeira a usá-las.
       </Text>
       <Text style={estilosConfig.notaPagina}>
-        A escolha vale só enquanto o app está aberto. Ao fechar, volta para Domingo e 24 horas.
+        A escolha fica salva neste aparelho e continua valendo quando o app fecha.
       </Text>
     </View>
   );

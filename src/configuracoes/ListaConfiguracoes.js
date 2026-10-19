@@ -1,4 +1,5 @@
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { router } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 import Avatar from '../componentes/Avatar';
@@ -7,104 +8,10 @@ import { BotaoConfig } from '../componentes/LinhasConfig';
 import { COR_ICONE_AZUL, COR_ICONE_LARANJA } from '../constantes/figma';
 import { nomeParaExibir } from '../utilidades/ajudantes';
 import { estilosConfig } from './estilosConfig';
-import PaginaAcessibilidade from './PaginaAcessibilidade';
-import PaginaDados from './PaginaDados';
-import PaginaDataHora from './PaginaDataHora';
-import PaginaFeedback from './PaginaFeedback';
-import PaginaNotificacoes from './PaginaNotificacoes';
-import PaginaPerfil from './PaginaPerfil';
-import PaginaSobre from './PaginaSobre';
-import PaginaTemas from './PaginaTemas';
 
-// O painel inteiro de Configurações fica dentro de uma ScrollView.
-// Com letra grande, a lista pode ficar maior que o painel e, assim, dá para rolar.
-// Com letra normal, o conteúdo cabe e nada rola.
-export default function PainelConfiguracoes(props) {
-  return (
-    <ScrollView
-      contentContainerStyle={styles.rolagemConfig}
-      showsVerticalScrollIndicator={false}
-    >
-      <ConteudoConfiguracoes {...props} />
-    </ScrollView>
-  );
-}
-
-// Conteúdo do painel de Configurações. Mostra a lista ou uma página interna,
-// conforme `paginaConfig`.
-function ConteudoConfiguracoes({
-  paginaConfig,
-  aoAbrirPagina,
-  aoVoltarParaLista,
-  aoVoltar,
-  modoTema,
-  aoEscolherTema,
-  primeiroDiaSemana,
-  aoEscolherPrimeiroDia,
-  formatoHora,
-  aoEscolherFormatoHora,
-  avisosDemo,
-  aoAlternarAviso,
-  tarefas,
-  categorias,
-  nomeUsuario,
-  aoMudarNome,
-}) {
-  if (paginaConfig === 'feedback') {
-    return <PaginaFeedback aoVoltar={aoVoltarParaLista} />;
-  }
-
-  if (paginaConfig === 'sobre') {
-    return <PaginaSobre aoVoltar={aoVoltarParaLista} />;
-  }
-
-  if (paginaConfig === 'perfil') {
-    return (
-      <PaginaPerfil
-        nomeUsuario={nomeUsuario}
-        aoMudarNome={aoMudarNome}
-        tarefas={tarefas}
-        aoVoltar={aoVoltarParaLista}
-      />
-    );
-  }
-
-  if (paginaConfig === 'temas') {
-    return (
-      <PaginaTemas modoTema={modoTema} aoEscolher={aoEscolherTema} aoVoltar={aoVoltarParaLista} />
-    );
-  }
-
-  if (paginaConfig === 'dataHora') {
-    return (
-      <PaginaDataHora
-        primeiroDiaSemana={primeiroDiaSemana}
-        aoEscolherPrimeiroDia={aoEscolherPrimeiroDia}
-        formatoHora={formatoHora}
-        aoEscolherFormatoHora={aoEscolherFormatoHora}
-        aoVoltar={aoVoltarParaLista}
-      />
-    );
-  }
-
-  if (paginaConfig === 'acessibilidade') {
-    return <PaginaAcessibilidade aoVoltar={aoVoltarParaLista} />;
-  }
-
-  if (paginaConfig === 'dados') {
-    return <PaginaDados tarefas={tarefas} categorias={categorias} aoVoltar={aoVoltarParaLista} />;
-  }
-
-  if (paginaConfig === 'notificacoes') {
-    return (
-      <PaginaNotificacoes
-        avisosDemo={avisosDemo}
-        aoAlternarAviso={aoAlternarAviso}
-        aoVoltar={aoVoltarParaLista}
-      />
-    );
-  }
-
+// Lista de Configurações, com o perfil e os três grupos do Figma.
+// Cada item abre a rota da sua página com router.push.
+export default function ListaConfiguracoes({ nomeUsuario, aoVoltar }) {
   return (
     <View style={estilosConfig.configMiolo}>
       {/* O título é o jeito de voltar ao menu. A caixa mede 40 (24 do texto + 16 de
@@ -118,10 +25,10 @@ function ConteudoConfiguracoes({
         <Text style={estilosConfig.tituloConfig}>Configurações</Text>
       </Pressable>
 
-      {/* No Figma, a área do perfil também tem uma seta. Agora ela abre a página Perfil. */}
+      {/* No Figma, a área do perfil também tem uma seta. Ela abre a página Perfil. */}
       <Pressable
         onPress={function () {
-          aoAbrirPagina('perfil');
+          router.push('/configuracoes/perfil');
         }}
         accessibilityRole="button"
         accessibilityLabel={'Perfil: ' + nomeParaExibir(nomeUsuario)}
@@ -140,7 +47,7 @@ function ConteudoConfiguracoes({
           icone={<MaterialCommunityIcons name="format-paint" size={24} color={COR_ICONE_AZUL} />}
           titulo="Temas"
           aoPressionar={function () {
-            aoAbrirPagina('temas');
+            router.push('/configuracoes/temas');
           }}
         />
       </GrupoVidro>
@@ -151,28 +58,28 @@ function ConteudoConfiguracoes({
           icone={<MaterialCommunityIcons name="clock" size={24} color={COR_ICONE_AZUL} />}
           titulo="Data e Hora"
           aoPressionar={function () {
-            aoAbrirPagina('dataHora');
+            router.push('/configuracoes/data-hora');
           }}
         />
         <BotaoConfig
           icone={<MaterialCommunityIcons name="bell" size={24} color={COR_ICONE_AZUL} />}
           titulo="Notificações"
           aoPressionar={function () {
-            aoAbrirPagina('notificacoes');
+            router.push('/configuracoes/notificacoes');
           }}
         />
         <BotaoConfig
           icone={<MaterialCommunityIcons name="database" size={24} color={COR_ICONE_AZUL} />}
           titulo="Dados"
           aoPressionar={function () {
-            aoAbrirPagina('dados');
+            router.push('/configuracoes/dados');
           }}
         />
         <BotaoConfig
           icone={<MaterialIcons name="accessibility" size={24} color={COR_ICONE_AZUL} />}
           titulo="Acessibilidade"
           aoPressionar={function () {
-            aoAbrirPagina('acessibilidade');
+            router.push('/configuracoes/acessibilidade');
           }}
         />
       </GrupoVidro>
@@ -183,7 +90,7 @@ function ConteudoConfiguracoes({
           icone={<MaterialIcons name="feedback" size={24} color={COR_ICONE_LARANJA} />}
           titulo="Feedback"
           aoPressionar={function () {
-            aoAbrirPagina('feedback');
+            router.push('/configuracoes/feedback');
           }}
         />
         <BotaoConfig
@@ -194,7 +101,7 @@ function ConteudoConfiguracoes({
           icone={<MaterialIcons name="description" size={24} color={COR_ICONE_LARANJA} />}
           titulo="Sobre"
           aoPressionar={function () {
-            aoAbrirPagina('sobre');
+            router.push('/configuracoes/sobre');
           }}
         />
       </GrupoVidro>
@@ -203,12 +110,6 @@ function ConteudoConfiguracoes({
 }
 
 const styles = StyleSheet.create({
-  // Rolagem do painel: flexGrow faz o conteúdo ocupar o painel todo quando cabe.
-  // O respiro embaixo evita que o último item encoste na borda ao rolar.
-  rolagemConfig: {
-    flexGrow: 1,
-    paddingBottom: 24,
-  },
   linhaUsuario: {
     flexDirection: 'row',
     alignItems: 'center',

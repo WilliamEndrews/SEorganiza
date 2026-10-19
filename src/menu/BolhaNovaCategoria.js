@@ -34,7 +34,7 @@ export default function BolhaNovaCategoria({
       >
         <Animated.View
           style={[
-            StyleSheet.absoluteFillObject,
+            StyleSheet.absoluteFill,
             {
               backgroundColor: 'rgba(0, 0, 0, 0.28)',
               opacity: aparecer,
@@ -123,11 +123,11 @@ export default function BolhaNovaCategoria({
 // Medidas minhas: o Figma não desenha essa aba.
 const styles = StyleSheet.create({
   camadaBolha: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     zIndex: 4,
   },
   fundoBolha: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   bolhaVidro: {
     position: 'absolute',

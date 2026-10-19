@@ -44,8 +44,8 @@ export default function PaginaPerfil({ nomeUsuario, aoMudarNome, tarefas, aoVolt
       </GrupoVidro>
 
       <Text style={estilosConfig.notaPagina}>
-        Perfil local: não há login, e-mail nem senha. O nome fica só neste aparelho, enquanto o
-        app estiver aberto. Ao fechar, ele se apaga.
+        Perfil local: não há login, e-mail nem senha. O nome fica salvo só neste aparelho e
+        continua aqui quando o app fecha. Para apagá-lo, use Dados.
       </Text>
       <Text style={estilosConfig.notaPagina}>Escolher foto ainda não está disponível.</Text>
     </View>

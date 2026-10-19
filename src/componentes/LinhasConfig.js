@@ -14,7 +14,7 @@ function destinoPendente() {
 // A linha inteira é um Pressable, então tocar em qualquer parte dela funciona.
 // O ícone chega pronto pela prop `icone`, porque cada linha usa um desenho diferente.
 // `aoPressionar` diz o que acontece no toque. Sem ela, a linha ainda não leva a lugar nenhum.
-export function BotaoConfig({ icone, titulo, aoPressionar }) {
+export function BotaoConfig({ icone, titulo, aoPressionar = null }) {
   return (
     <Pressable
       onPress={aoPressionar || destinoPendente}
@@ -37,7 +37,7 @@ export function BotaoConfig({ icone, titulo, aoPressionar }) {
 // A seleção aparece de três jeitos, para não depender só da cor:
 // círculo com visto (em vez de círculo vazio), texto em negrito e,
 // quando há desenho, um contorno nele.
-export function OpcaoEscolha({ titulo, desenho, selecionado, aoEscolher }) {
+export function OpcaoEscolha({ titulo, desenho = null, selecionado, aoEscolher }) {
   return (
     <Pressable
       onPress={aoEscolher}

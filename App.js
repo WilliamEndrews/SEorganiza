@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+/*import { useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
   Animated,
@@ -150,7 +150,7 @@ export default function App() {
       {tema.veu ? (
         <View style={[styles.veuTema, { backgroundColor: tema.veu }]} />
       ) : null}
-      {/* Sol de dia, lua de noite. Fica atrás do título e do card. */}
+      {/* Sol de dia, lua de noite. Fica atrás do título e do card. *//*/}/*
       <LinearGradient
         colors={tema.astro.cores}
         locations={tema.astro.posicoes}
@@ -424,4 +424,4 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0, 0, 0, 0.45)',
   },
-});
+});*/

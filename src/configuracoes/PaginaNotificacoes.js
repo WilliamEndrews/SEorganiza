@@ -40,7 +40,7 @@ export default function PaginaNotificacoes({ avisosDemo, aoAlternarAviso, aoVolt
         Apenas demonstração: nenhuma notificação é enviada, agendada ou pedida ao sistema.
       </Text>
       <Text style={estilosConfig.notaPagina}>
-        As chaves valem só enquanto o app está aberto. Ao fechar, voltam ao estado inicial.
+        As chaves ficam salvas neste aparelho e continuam iguais quando o app fecha.
       </Text>
     </View>
   );

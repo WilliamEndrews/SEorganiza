@@ -66,7 +66,7 @@ export default function PaginaTemas({ modoTema, aoEscolher, aoVoltar }) {
         {HORA_POR_DO_SOL}h e noite no resto.
       </Text>
       <Text style={estilosConfig.notaPagina}>
-        A escolha vale só enquanto o app está aberto. Ao fechar, ele volta para Automático.
+        A escolha fica salva neste aparelho e continua valendo quando o app fecha.
       </Text>
     </View>
   );

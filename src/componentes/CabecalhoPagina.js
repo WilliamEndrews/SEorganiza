@@ -3,15 +3,19 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { estilosConfig } from '../configuracoes/estilosConfig';
 
-// Cabeçalho das páginas internas de Configurações: a seta e o título formam um
-// botão só, que volta para a lista. O espaço vazio à direita, do tamanho da seta,
-// mantém o título centralizado.
-export default function CabecalhoPagina({ titulo, aoVoltar }) {
+// Cabeçalho das páginas de opções: a seta e o título formam um botão só, que
+// volta para a tela anterior (a lista de Configurações ou o menu). O espaço vazio
+// à direita, do tamanho da seta, mantém o título centralizado.
+export default function CabecalhoPagina({
+  titulo,
+  aoVoltar,
+  rotuloVoltar = 'Voltar para Configurações',
+}) {
   return (
     <Pressable
       onPress={aoVoltar}
       accessibilityRole="button"
-      accessibilityLabel="Voltar para Configurações"
+      accessibilityLabel={rotuloVoltar}
       style={styles.cabecalhoPagina}
     >
       <Ionicons name="chevron-back" size={22} color="#FFFFFF" />

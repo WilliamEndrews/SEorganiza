@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Animated, Dimensions, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { Stack, ThemeProvider } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import {
@@ -11,17 +11,13 @@ import {
   TELA_ALTURA,
   TELA_LARGURA,
 } from '../../constantes/figma';
+import { TEMA_NAVEGACAO_TRANSPARENTE } from '../../constantes/navegacao';
 import { useOpcoes } from '../../contexto/OpcoesContext';
 
 // Se alguém abrir um endereço como /configuracoes/temas direto, a lista de
 // Configurações entra na pilha antes. Assim, Voltar leva para a lista.
 export const unstable_settings = {
   anchor: 'configuracoes/index',
-};
-
-const TEMA_TRANSPARENTE = {
-  ...DefaultTheme,
-  colors: { ...DefaultTheme.colors, background: 'transparent' },
 };
 
 // Moldura de vidro comum a todas as rotas de opções (Configurações, categorias e
@@ -90,7 +86,7 @@ export default function LayoutOpcoes() {
           />
           {/* Cada tela da pilha pinta o fundo com a cor do tema. Aqui o fundo do tema
               fica transparente para o vidro aparecer atrás das páginas. */}
-          <ThemeProvider value={TEMA_TRANSPARENTE}>
+          <ThemeProvider value={TEMA_NAVEGACAO_TRANSPARENTE}>
             <Stack
               screenOptions={{
                 headerShown: false,

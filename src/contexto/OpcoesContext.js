@@ -74,6 +74,14 @@ export function OpcoesProvider({ children }) {
   const [deslizeConfig] = useState(function () {
     return new Animated.Value(1);
   });
+  // Deslize entre as páginas principais 
+  
+  const [deslizeAba] = useState(function () {
+    return new Animated.Value(0);
+  });
+  // Qual página principal está aberta por baixo das opções: '/' ou '/calendario'.
+
+  const rotaPrincipal = useRef('/');
 
   // Ao abrir o app, lê o que foi salvo da última vez. A lista vazia no fim faz
   // isto rodar uma vez só. O que nunca foi salvo continua com o valor inicial.
@@ -181,15 +189,38 @@ export function OpcoesProvider({ children }) {
     }
   }
 
-  // Fecha as opções e volta para o menu. Primeiro o vidro sai da tela; só quando
-  // essa animação termina é que o menu abre e as rotas de opções saem da pilha.
-  // `depois` é opcional e roda no fim, com o vidro já fora da tela. A checagem de
-  // tipo existe porque esta função também vai direto no onPress, que passa o evento.
+  /* Fecha as opções e volta para o menu. Primeiro o vidro sai da tela; só quando
+  // essa animação termina é que o menu abre*/
+
   function voltarAoMenu(depois) {
     animarPainel(deslizeConfig, 1, function () {
       setMenuAberto(true);
-      router.dismissTo('/');
+      router.dismissTo(rotaPrincipal.current);
       if (typeof depois === 'function') depois();
+    });
+  }
+
+  // Ida para o Calendário: leva o valor de 0 para 1 em 280 ms.
+ 
+  function entrarNoCalendario() {
+    rotaPrincipal.current = '/calendario';
+    animarPainel(deslizeAba, 1);
+  }
+
+  // Chamada pela PaginaCalendario quando ela sai da tela
+  // Deixa tudo pronto para a próxima entrada: o valor volta para 0 (página
+  
+  function sairDoCalendario() {
+    deslizeAba.setValue(0);
+    rotaPrincipal.current = '/';
+  }
+
+  // Volta do Calendário para a página inicial. A ordem importa, e é a mesma de
+  // voltarAoMenu:
+
+  function voltarAoInicio() {
+    animarPainel(deslizeAba, 0, function () {
+      router.dismissTo('/');
     });
   }
 
@@ -232,9 +263,13 @@ export function OpcoesProvider({ children }) {
         setMenuAberto,
         entrarNasOpcoes,
         voltarAoMenu,
+        entrarNoCalendario,
+        sairDoCalendario,
+        voltarAoInicio,
         alvoDesfoque,
         deslizeMenu,
         deslizeConfig,
+        deslizeAba,
       }}
     >
       {children}
@@ -242,8 +277,7 @@ export function OpcoesProvider({ children }) {
   );
 }
 
-// Atalho para as telas lerem o Context. Avisa cedo se alguma tela ficar fora do
-// Provider, em vez de quebrar depois com "undefined".
+
 export function useOpcoes() {
   const contexto = useContext(OpcoesContext);
   if (!contexto) {

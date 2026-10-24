@@ -133,12 +133,12 @@ export default function LayoutPrincipal() {
             >
               <Stack.Screen name="index" />
 
-              /* presentation 'containedTransparentModal':
+              {/* presentation 'containedTransparentModal':
                   - "Transparent": o Calendário abre POR CIMA da rota "/" sem
                     escondê-la. A página inicial continua desenhada por baixo, e
                     isso é necessário para as duas deslizarem ao mesmo tempo.
                   - "Contained": a tela fica presa ao palco. No iOS, sem isso, ela
-                    cobriria a tela inteira, inclusive a barra de baixo. */
+                    cobriria a tela inteira, inclusive a barra de baixo. */}
 
               <Stack.Screen
                 name="calendario"
@@ -147,10 +147,10 @@ export default function LayoutPrincipal() {
             </Stack>
           </ThemeProvider>
 
-          /* O + fica na moldura porque está no mesmo lugar nas duas telas do
+          {/* O + fica na moldura porque está no mesmo lugar nas duas telas do
               Figma: assim ele não desliza junto com as páginas.
               pointerEvents 'box-none': a faixa invisível que centraliza o botão
-              não rouba os toques; só o próprio botão recebe toque. */
+              não rouba os toques; só o próprio botão recebe toque. */}
 
           <View style={styles.areaAdicionar}>
             <View style={styles.botaoAdicionar}>

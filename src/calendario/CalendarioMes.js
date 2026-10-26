@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, TouchableOpacity, Text } from "react-native";
+import { StyleSheet, View, TouchableOpacity, Text } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { ptBR } from "../../src/utilidades/localeCalendarConfig.js";
 
@@ -14,14 +15,14 @@ export default function CalendarioMes({ corTexto }) {
   return (
     <View>
       <Calendar
-        style={{
-          backgroundColor: "transparent",
-          borderWidth: 1,
-          borderRadius: 10,
-          borderColor: corTexto,
-          padding: 5,
-          boxShadow: "0px 4px 2px rgba(0, 0, 0, 0.25)",
-        }}
+        style={[styles.calendario, { borderColor: corTexto }]}
+        renderArrow={(direction) => (
+          <Ionicons
+            name={direction === "left" ? "chevron-back" : "chevron-forward"}
+            color={corTexto}
+            size={15}
+          />
+        )}
         headerStyle={{
           borderBottomWidth: 1,
           borderBlockColor: corTexto,
@@ -31,29 +32,56 @@ export default function CalendarioMes({ corTexto }) {
           textMonthFontSize: 25,
           arrowColor: corTexto,
           textSectionTitleColor: corTexto,
-
-          textDisabledColor: "rgba(255, 255, 255, .40)",
-          dayTextColor: "black",
-          todayTextColor: "#0088FF",
-
           calendarBackground: "transparent",
-          selectedDayBackgroundColor: "#0088FF",
-          selectedDayTextColor: "white",
+          arrowStyle: { padding: 0, margin: 0 },
         }}
-        onDayPress={setDay}
-        markedDates={
-          day && {
-            [day.dateString]: {selected: true}
-          }
-        }
-        /* dayComponent={({ date }) => {
+        dayComponent={({ date, state }) => {
           return (
-            <TouchableOpacity>
-              <Text>{date.day}</Text>
+            <TouchableOpacity
+              style={[
+                styles.day,
+                date.dateString === day?.dateString && styles.selectedDay,
+              ]}
+            >
+              <Text
+                onPress={() => setDay(date)}
+                style={[
+                  { color: corTexto },
+                  state === "today" && styles.today,
+                  date.dateString === day?.dateString && { color: corTexto },
+                ]}
+              >
+                {state != "disabled" ? date.day : ""}
+              </Text>
             </TouchableOpacity>
           );
-        }} */
+        }}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  calendario: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 5,
+    boxShadow: "0px 4px 2px rgba(0, 0, 0, 0.25)",
+  },
+  day: {
+    width: 32,
+    height: 32,
+    alignItems: /** @type {"center"} */ ("center"),
+    justifyContent: /** @type {"center"} */ ("center"),
+    borderRadius: 8,
+  },
+  today: {
+    color: "#0088FF",
+    fontWeight: "bold",
+  },
+  selectedDay: {
+    backgroundColor: "#0088FF",
+    color: "white",
+  },
+});

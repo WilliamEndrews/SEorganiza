@@ -1,19 +1,19 @@
 import { useLocalSearchParams } from 'expo-router';
 import PaginaCategoria from '../../../categorias/PaginaCategoria';
-import { CATEGORIAS_FIXAS, TAREFAS } from '../../../constantes/dados';
+import { CATEGORIAS_FIXAS } from '../../../constantes/dados';
 import { useOpcoes } from '../../../contexto/OpcoesContext';
 
-// Rota dinâmica "/categoria/[id]": o id vem do endereço, por exemplo
-// /categoria/trabalho. A página busca a categoria no Context com esse id.
+// Rota dinâmica "/categoria/[id]". O id vem do endereço (tipo /categoria/trabalho)
+// pelo useLocalSearchParams, e com ele buscamos a categoria no Context.
 export default function RotaCategoria() {
   const { id } = useLocalSearchParams();
-  const { buscarCategoriaPorId, excluirCategoria, voltarAoMenu } = useOpcoes();
+  const { buscarCategoriaPorId, excluirCategoria, voltarAoMenu, tarefasAtivas } = useOpcoes();
   const categoria = buscarCategoriaPorId(id);
   const ehFixa = CATEGORIAS_FIXAS.some(function (fixa) {
     return fixa.id === id;
   });
-  const tarefasDaCategoria = TAREFAS.filter(function (tarefa) {
-    return tarefa.categoriaId === id && !tarefa.excluida;
+  const tarefasDaCategoria = tarefasAtivas.filter(function (tarefa) {
+    return tarefa.categoriaId === id;
   });
 
   return (
@@ -22,8 +22,8 @@ export default function RotaCategoria() {
       tarefas={tarefasDaCategoria}
       podeExcluir={!ehFixa}
       aoExcluir={function () {
-        // Exclui só depois que o vidro sai da tela, para a página não trocar
-        // para "não encontrada" no meio da animação.
+        // Só exclui depois que o vidro sai da tela, senão aparece
+        // "não encontrada" no meio da animação.
         voltarAoMenu(function () {
           excluirCategoria(id);
         });

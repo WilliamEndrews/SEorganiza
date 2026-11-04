@@ -1,6 +1,6 @@
-// Medidas, cores e efeitos lidos no protótipo do Figma.
+// Medidas, cores e efeitos tirados do Figma.
 
-// iPhone 14 Plus do Figma. O painel da tela 7 fica nestas coordenadas.
+// Tela do iPhone 14 Plus no Figma e o painel da tela 7.
 export const TELA_LARGURA = 428;
 export const TELA_ALTURA = 926;
 export const PAINEL_X = 128;
@@ -8,41 +8,52 @@ export const PAINEL_Y = 46;
 export const PAINEL_LARGURA = 288;
 export const PAINEL_ALTURA = 780;
 
-// Painel de Configurações (nó 114:68). A caixa exportada mede 403×881.
+// Painel de Configurações: tamanho e posição.
 export const CONFIG_LARGURA = 403;
 export const CONFIG_ALTURA = 881;
-// Posição lida no Figma (Group 12): 12 px da esquerda e 28 px do topo.
 export const CONFIG_X = 12;
 export const CONFIG_Y = 28;
 
-// Comentário 9 do Figma: os dois retângulos azuis usam o mesmo degradê,
-// de #5C6674 até #9AB3D3.
-// Direção medida em pixels na imagem do Figma: o escuro fica no canto
-// superior esquerdo e o claro vai para a direita e para baixo (diagonal).
-// Isso corrige a primeira versão, que tinha o degradê na vertical.
-// Os números de start/end são frações do retângulo (0 = começo, 1 = fim).
+// Degradê azul na diagonal: escuro no canto de cima à esquerda, claro para
+// baixo e para a direita. start/end vão de 0 (começo) a 1 (fim).
 export const DEGRADE_AZUL = ['#5C6674', '#9AB3D3'];
 export const DEGRADE_AZUL_INICIO = { x: 0, y: 0 };
 export const DEGRADE_AZUL_FIM = { x: 0.93, y: 0.4 };
 
-// Comentário 10: o retângulo laranja vai de #B2621D até #D9C5A0.
-// Também medido na imagem: laranja forte no canto superior esquerdo e
-// bege claro para a direita, com uma inclinação menor que a do azul.
+// Degradê laranja: mesma ideia do azul, só que menos inclinado.
 export const DEGRADE_LARANJA = ['#B2621D', '#D9C5A0'];
 export const DEGRADE_LARANJA_INICIO = { x: 0, y: 0 };
 export const DEGRADE_LARANJA_FIM = { x: 0.8, y: 0.22 };
 
-// Quanto o degradê dos grupos "cobre" o painel: 1 é opaco, 0 é invisível.
-// Quanto menor, mais translúcido (mais do painel escuro aparece por trás),
-// mas o texto preto fica mais difícil de ler. Veja o comentário em GrupoVidro.
+// 1 = degradê opaco, 0 = invisível. Menor fica mais transparente, mas o texto
+// preto fica mais difícil de ler.
 export const OPACIDADE_VIDRO = 0.5;
 
-// Cores dos ícones lidas na imagem do Figma.
 export const COR_ICONE_AZUL = '#0088FF';
 export const COR_ICONE_LARANJA = '#FFAA00';
 
-// Vidro do Figma: luz -45° a 80%, refração 80, profundidade 20,
-// dispersão 50, gelo 15 e distorção splay.
+// Fundo do Login e do Cadastro: degradê de cima para baixo sobre o cinza base.
+// O @type avisa a checagem de tipos que as listas têm 2 itens ou mais.
+/** @type {{ base: string, cores: [string, string, ...string[]], posicoes: [number, number, ...number[]] }} */
+export const FUNDO_CONTA = {
+  base: '#F2F2F7',
+  cores: [
+    'rgba(183, 226, 239, 0.8)',
+    'rgba(132, 220, 218, 0.8)',
+    'rgba(174, 238, 233, 0.8)',
+    'rgba(168, 238, 173, 0.8)',
+    'rgba(113, 239, 78, 0.8)',
+  ],
+  posicoes: [0, 0.115, 0.192, 0.346, 0.986],
+};
+export const COR_CAMPO_CONTA = '#D9D9D9';
+export const COR_BOTAO_CONTA = '#5E64BF';
+// Os mesmos nomes usados no useFonts do layout raiz.
+export const FONTE_TITULO_CONTA = 'Jaro';
+export const FONTE_LINK_CONTA = 'JetBrainsMono';
+export const FONTE_DESTAQUE_CONTA = 'JuliusSansOne';
+
+// Efeito de vidro (versão aproximada do Figma).
 export const vidro = {
   backgroundColor: 'rgba(255, 255, 255, 0.18)',
   borderWidth: 1,

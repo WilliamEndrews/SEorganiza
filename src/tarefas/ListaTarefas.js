@@ -1,14 +1,14 @@
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import GrupoVidro from '../componentes/GrupoVidro';
 import { estilosConfig } from '../configuracoes/estilosConfig';
 
-// Lista de tarefas usada pelas categorias e por Tarefas Concluídas e Excluídas.
-// É uma FlatList (aula 02): ela só desenha as linhas que aparecem na tela, o que
-// importa quando a lista cresce. Lista vazia mostra `mensagemVazia`.
-// `rodape` é opcional e aparece embaixo da lista (por exemplo, um botão).
-export default function ListaTarefas({ tarefas, mensagemVazia, rodape = null }) {
+// Lista de tarefas das categorias e de Tarefas Concluídas/Excluídas (FlatList, aula 02).
+// `rodape` (opcional) aparece embaixo da lista, tipo um botão.
+// `acoes` (opcional) são botões que aparecem em cada linha, assim:
+//   [{ icone: 'trash-outline', rotulo: 'Apagar', aoTocar: function (id) {...} }]
+export default function ListaTarefas({ tarefas, mensagemVazia, rodape = null, acoes = [] }) {
   return (
     <FlatList
       data={tarefas}
@@ -16,7 +16,7 @@ export default function ListaTarefas({ tarefas, mensagemVazia, rodape = null }) 
         return tarefa.id;
       }}
       renderItem={function ({ item }) {
-        return <LinhaTarefa tarefa={item} />;
+        return <LinhaTarefa tarefa={item} acoes={acoes} />;
       }}
       ItemSeparatorComponent={Separador}
       ListEmptyComponent={<Text style={estilosConfig.notaPagina}>{mensagemVazia}</Text>}
@@ -27,7 +27,7 @@ export default function ListaTarefas({ tarefas, mensagemVazia, rodape = null }) 
   );
 }
 
-function LinhaTarefa({ tarefa }) {
+function LinhaTarefa({ tarefa, acoes }) {
   return (
     <GrupoVidro cor="azul" style={estilosConfig.grupo}>
       <View style={estilosConfig.linhaConfig}>
@@ -39,6 +39,25 @@ function LinhaTarefa({ tarefa }) {
         <Text numberOfLines={1} style={estilosConfig.textoConfig}>
           {tarefa.titulo}
         </Text>
+        {/* Um botão para cada ação. O rótulo serve de key e de texto pro leitor de tela. */}
+        {acoes.map(function (acao) {
+          return (
+            <Pressable
+              key={acao.rotulo}
+              onPress={function () {
+                acao.aoTocar(tarefa.id);
+              }}
+              hitSlop={8}
+              accessibilityRole="button"
+              accessibilityLabel={acao.rotulo + ': ' + tarefa.titulo}
+              style={function (estado) {
+                return [styles.botaoAcao, estado.pressed ? styles.pressionado : null];
+              }}
+            >
+              <Ionicons name={acao.icone} size={22} color="#000000" />
+            </Pressable>
+          );
+        })}
       </View>
     </GrupoVidro>
   );
@@ -54,5 +73,11 @@ const styles = StyleSheet.create({
   },
   separador: {
     height: 8,
+  },
+  botaoAcao: {
+    marginLeft: 12,
+  },
+  pressionado: {
+    opacity: 0.5,
   },
 });

@@ -1,14 +1,13 @@
 import { router } from 'expo-router';
 import PaginaDados from '../../../configuracoes/PaginaDados';
-import { TAREFAS } from '../../../constantes/dados';
 import { useOpcoes } from '../../../contexto/OpcoesContext';
 
-// Rota "/configuracoes/dados".
+// Rota "/configuracoes/dados". Conta só as tarefas fora da lixeira (tarefasAtivas).
 export default function RotaDados() {
-  const { categorias, apagarDadosSalvos } = useOpcoes();
+  const { tarefasAtivas, categorias, apagarDadosSalvos } = useOpcoes();
   return (
     <PaginaDados
-      tarefas={TAREFAS}
+      tarefas={tarefasAtivas}
       categorias={categorias}
       aoApagarDados={apagarDadosSalvos}
       aoVoltar={function () {

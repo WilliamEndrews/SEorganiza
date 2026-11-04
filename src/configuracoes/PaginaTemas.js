@@ -7,8 +7,8 @@ import { OpcaoEscolha } from '../componentes/LinhasConfig';
 import { HORA_NASCER_DO_SOL, HORA_POR_DO_SOL, TEMAS } from '../constantes/temas';
 import { estilosConfig } from './estilosConfig';
 
-// Mini desenho do sol ou da lua, com as mesmas cores do canto da tela inicial.
-// Recebe o `astro` de um tema (cores e pontos do degradê) e desenha uma elipse pequena.
+// Sol ou lua pequenininho, com as mesmas cores do canto da tela inicial.
+// Recebe o `astro` de um tema (as cores do degradê).
 function MiniAstro({ astro }) {
   return (
     <LinearGradient
@@ -19,9 +19,8 @@ function MiniAstro({ astro }) {
   );
 }
 
-// Página Temas: o usuário escolhe entre seguir o relógio ou fixar dia ou noite.
-// Ao tocar numa opção, chamamos aoEscolher, que muda o `modoTema` lá no App.
-// A tela inicial, que aparece atrás do vidro, muda na hora.
+// Página Temas: seguir o relógio ou fixar dia ou noite.
+// aoEscolher muda o `modoTema` no App, e a tela inicial atrás do vidro já muda na hora.
 export default function PaginaTemas({ modoTema, aoEscolher, aoVoltar }) {
   return (
     <View style={estilosConfig.configMiolo}>
@@ -73,7 +72,7 @@ export default function PaginaTemas({ modoTema, aoEscolher, aoVoltar }) {
 }
 
 const styles = StyleSheet.create({
-  // Medidas minhas, pois o Figma não desenha essa página.
+  // Medidas nossas (o Figma não tem essa página).
   miniAstro: {
     width: 40,
     height: 27,

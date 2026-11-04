@@ -14,15 +14,15 @@ import {
 import { TEMA_NAVEGACAO_TRANSPARENTE } from '../../constantes/navegacao';
 import { useOpcoes } from '../../contexto/OpcoesContext';
 
-// Se alguém abrir um endereço como /configuracoes/temas direto, a lista de
-// Configurações entra na pilha antes. Assim, Voltar leva para a lista.
+// Se abrir direto algo como /configuracoes/temas, a lista de Configurações
+// entra antes na pilha, para o Voltar levar até ela.
 export const unstable_settings = {
   anchor: 'configuracoes/index',
 };
 
-// Moldura de vidro comum a todas as rotas de opções (Configurações, categorias e
-// tarefas). As listas usam a mesma posição e o mesmo tamanho de Configurações. Ela fica sobre a tela inicial, que continua desenhada por baixo.
-// O Stack de dentro troca só o conteúdo do vidro, sem animação própria.
+// Painel de vidro de todas as telas de opções (Configurações, categorias e
+// tarefas). Fica por cima da tela inicial, e o Stack de dentro troca só o
+// conteúdo do vidro.
 export default function LayoutOpcoes() {
   const { entrarNasOpcoes, voltarAoMenu, alvoDesfoque, deslizeConfig } = useOpcoes();
   const tela = Dimensions.get('window');
@@ -34,12 +34,9 @@ export default function LayoutOpcoes() {
     outputRange: [esquerdaConfig, tela.width],
   });
 
-  // Ao entrar nas opções, o menu (se estiver aberto) sai primeiro e depois o vidro
-  // entra. A tela inicial continua visível atrás, então a saída do menu aparece.
-  // Ao sair por outro caminho (como o Voltar do Android), o vidro fica pronto,
-  // fora da tela, para a próxima entrada.
-  // A lista vazia faz isto rodar só na entrada. entrarNasOpcoes é recriada a cada
-  // desenho do Provider; colocá-la na lista repetiria a animação a cada mudança.
+  // Quando abre, o menu sai e o vidro desliza para dentro.
+  // A lista vazia [] faz isso rodar uma vez só. O return roda quando fecha
+  // (até pelo Voltar do Android) e deixa o vidro fora da tela para a próxima vez.
   useEffect(function () {
     entrarNasOpcoes();
     return function () {
@@ -84,10 +81,10 @@ export default function LayoutOpcoes() {
             end={{ x: 0.65, y: 1 }}
             style={[styles.brilho, { pointerEvents: 'none' }]}
           />
-          {/* Cada tela da pilha pinta o fundo com a cor do tema. Aqui o fundo do tema
-              fica transparente para o vidro aparecer atrás das páginas. */}
+          {/* Tema com fundo transparente para o vidro aparecer atrás das telas. */}
           <ThemeProvider value={TEMA_NAVEGACAO_TRANSPARENTE}>
             <Stack
+              id={undefined}
               screenOptions={{
                 headerShown: false,
                 animation: 'none',
@@ -102,14 +99,12 @@ export default function LayoutOpcoes() {
   );
 }
 
-// Rotas que já rolam sozinhas, porque a lista delas é uma FlatList. Uma FlatList
-// dentro de uma ScrollView perde a vantagem de desenhar só o que aparece, e o
-// React Native avisa disso no console.
+// Rotas com FlatList já rolam sozinhas (aula 02). FlatList dentro de ScrollView
+// dá aviso no console, então essas ficam de fora.
 const ROTAS_COM_LISTA = ['categoria/[id]', 'tarefas/concluidas', 'tarefas/excluidas'];
 
-// As outras rotas de opções ficam dentro de uma ScrollView.
-// Com letra grande, a página pode ficar maior que o painel e, assim, dá para rolar.
-// Com letra normal, o conteúdo cabe e nada rola.
+// As outras rotas ganham uma ScrollView, para dar para rolar quando a letra do
+// celular está grande e a página não cabe no painel.
 function RolagemConfig({ route, children }) {
   if (ROTAS_COM_LISTA.includes(route.name)) {
     return <View style={styles.tela}>{children}</View>;
@@ -138,13 +133,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.28)',
   },
-  // Preenchimento pedido: #000000 a 45%.
-  // O Figma tem dois retângulos empilhados (Rectangle 16 e Rectangle 21).
-  // Duas camadas de 45% dão cerca de 70% de preto (1 - 0,55 × 0,55).
-  // Conferi na imagem: o painel sobre o fundo claro mede perto de #3C4E54,
-  // que combina com 70%. Por isso o véu aparece duas vezes no painel.
-  // O gelo 12 do Figma não usa a mesma escala do Expo (1 a 100).
-  // Refração, dispersão e splay não existem no Expo.
+  // Preto a 45%. No Figma são dois retângulos assim, um em cima do outro,
+  // por isso o véu aparece duas vezes no painel.
   veuConfig: {
     ...StyleSheet.absoluteFill,
     backgroundColor: 'rgba(0, 0, 0, 0.45)',
@@ -152,8 +142,8 @@ const styles = StyleSheet.create({
   brilho: {
     ...StyleSheet.absoluteFill,
   },
-  // Rolagem do painel: flexGrow faz o conteúdo ocupar o painel todo quando cabe.
-  // O respiro embaixo evita que o último item encoste na borda ao rolar.
+  // flexGrow faz o conteúdo ocupar o painel todo. O padding embaixo evita que
+  // o último item encoste na borda.
   rolagemConfig: {
     flexGrow: 1,
     paddingBottom: 24,

@@ -5,9 +5,8 @@ import GrupoVidro from '../componentes/GrupoVidro';
 import { OpcaoEscolha } from '../componentes/LinhasConfig';
 import { estilosConfig } from './estilosConfig';
 
-// Página Data e Hora: duas preferências, cada uma num retângulo azul.
-// Ao tocar numa opção, chamamos a função que muda o estado lá no App.
-// Hoje nenhuma tela usa essas escolhas (a agenda ainda não existe).
+// Página Data e Hora: duas preferências que ficam guardadas no App.
+// Ainda nenhuma tela usa essas escolhas (a agenda não existe ainda).
 export default function PaginaDataHora({
   primeiroDiaSemana,
   aoEscolherPrimeiroDia,

@@ -4,11 +4,10 @@ import CabecalhoPagina from '../componentes/CabecalhoPagina';
 import GrupoVidro from '../componentes/GrupoVidro';
 import { LinhaDado } from '../componentes/LinhasConfig';
 import { estilosConfig } from './estilosConfig';
-// Nome e versão do app, lidos do app.json. Assim a tela Sobre nunca mostra um valor inventado.
+// Nome e versão do app vêm direto do app.json.
 import appJson from '../../app.json';
 
 // Página Sobre: uma descrição curta, o nome e a versão.
-// Nome e versão vêm do app.json. Nada aqui é inventado.
 export default function PaginaSobre({ aoVoltar }) {
   return (
     <View style={estilosConfig.configMiolo}>
@@ -20,8 +19,8 @@ export default function PaginaSobre({ aoVoltar }) {
       </GrupoVidro>
 
       <Text style={estilosConfig.notaPagina}>
-        SEorganize é um aplicativo para organizar tarefas. Ele ainda está em desenvolvimento:
-        várias partes, como criar tarefas, ainda não existem.
+        SEorganize é um aplicativo para organizar tarefas: crie, conclua e acompanhe pelo
+        calendário. Ele ainda está em desenvolvimento: lembretes e Siga-nos ainda não existem.
       </Text>
       <Text style={estilosConfig.notaPagina}>Nome e versão vêm da configuração do app (app.json).</Text>
     </View>

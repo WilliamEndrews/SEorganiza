@@ -4,10 +4,10 @@ import CabecalhoPagina from '../componentes/CabecalhoPagina';
 import { estilosConfig } from '../configuracoes/estilosConfig';
 import ListaTarefas from '../tarefas/ListaTarefas';
 
-// Página de uma categoria: as tarefas dela numa FlatList.
-// Se o endereço tiver um id que não existe (por exemplo /categoria/xyz),
-// `categoria` chega vazia e a página avisa, como o "aluno não encontrado" da aula 03.
-// Só as categorias criadas pelo usuário mostram o botão de excluir.
+// Página de uma categoria com as tarefas dela.
+// Se o id não existe (tipo /categoria/xyz), `categoria` chega vazia e a página
+// avisa, igual ao "aluno não encontrado" da aula 03.
+// Só as categorias criadas pelo usuário têm o botão de excluir.
 export default function PaginaCategoria({ categoria, tarefas, podeExcluir, aoExcluir, aoVoltar }) {
   if (!categoria) {
     return (
@@ -26,7 +26,7 @@ export default function PaginaCategoria({ categoria, tarefas, podeExcluir, aoExc
       <CabecalhoPagina titulo={categoria.nome} aoVoltar={aoVoltar} rotuloVoltar="Voltar ao menu" />
       <ListaTarefas
         tarefas={tarefas}
-        mensagemVazia="Nenhuma tarefa nesta categoria ainda. O app ainda não tem tela para criar tarefas."
+        mensagemVazia="Nenhuma tarefa nesta categoria ainda. Crie uma pelo botão + da tela inicial."
         rodape={
           podeExcluir ? (
             <Pressable
@@ -46,7 +46,7 @@ export default function PaginaCategoria({ categoria, tarefas, podeExcluir, aoExc
   );
 }
 
-// Medidas minhas, pois o Figma não desenha essa página. O botão segue o de Dados.
+// Medidas nossas (o Figma não tem essa página). Botão igual ao de Dados.
 const styles = StyleSheet.create({
   aviso: {
     marginTop: 14,

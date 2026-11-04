@@ -5,8 +5,8 @@ import GrupoVidro from '../componentes/GrupoVidro';
 import { LinhaChave } from '../componentes/LinhasConfig';
 import { estilosConfig } from './estilosConfig';
 
-// Página Notificações: SOMENTE DEMONSTRATIVA.
-// As chaves mudam na tela, mas o app não envia, agenda nem pede permissão de aviso.
+// Página Notificações: por enquanto é só demonstração.
+// As chaves mudam na tela, mas o app não manda nenhum aviso de verdade.
 export default function PaginaNotificacoes({ avisosDemo, aoAlternarAviso, aoVoltar }) {
   return (
     <View style={estilosConfig.configMiolo}>

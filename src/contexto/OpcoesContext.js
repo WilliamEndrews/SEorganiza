@@ -4,21 +4,19 @@ import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { CATEGORIAS_FIXAS } from '../constantes/dados';
 import { animarPainel } from '../utilidades/animarPainel';
+import {
+  CAMPOS_DO_USUARIO,
+  carregar,
+  chaveDoUsuario,
+  salvar,
+} from '../utilidades/armazenamento';
+import { dataDeHoje } from '../utilidades/ajudantes';
+import { useConta } from './ContaContext';
 
-// Context da área de opções, no molde do AlunosContext da aula 03.
-// Guarda o que mais de uma tela precisa ler ou alterar: as preferências de
-// Configurações, as categorias e se o menu está aberto.
+// Context das opções, no molde do AlunosContext da aula 03.
+// Guarda o que várias telas usam: preferências, categorias, tarefas e o menu.
+// Cada dado é salvo com o e-mail de quem está logado (veja chaveDoUsuario).
 const OpcoesContext = createContext(null);
-
-// Uma chave do AsyncStorage para cada dado salvo (aula 05).
-const CHAVES = {
-  nome: '@seorganize/nome',
-  tema: '@seorganize/tema',
-  primeiroDia: '@seorganize/primeiroDia',
-  formatoHora: '@seorganize/formatoHora',
-  avisos: '@seorganize/avisos',
-  categorias: '@seorganize/categorias',
-};
 
 // Valores de quando nada foi salvo. "Apagar dados salvos" volta para eles.
 const INICIAL = {
@@ -28,45 +26,36 @@ const INICIAL = {
   formatoHora: '24h',
   avisos: { lembretes: true, resumoDoDia: false, atrasadas: true },
   categorias: [],
+  tarefas: [],
 };
 
-// O AsyncStorage só guarda texto. Por isso o valor vira JSON antes de salvar.
-async function salvar(chave, valor) {
-  try {
-    await AsyncStorage.setItem(chave, JSON.stringify(valor));
-  } catch (erro) {
-    console.warn('Não foi possível salvar ' + chave, erro);
-  }
-}
-
-// Lê uma chave e desfaz o JSON. Devolve null se ela nunca foi salva.
-async function carregar(chave) {
-  const texto = await AsyncStorage.getItem(chave);
-  return texto === null ? null : JSON.parse(texto);
-}
-
 export function OpcoesProvider({ children }) {
-  // Nome do perfil local. Não existe login, e-mail nem senha: é só um nome que o
-  // usuário digita. Vazio significa "ainda sem nome": a tela mostra o texto
-  // padrão do Figma.
+  // Quem está logado (vem do ContaContext). null = ninguém.
+  const { emailLogado } = useConta();
+  // Nome do perfil. Começa com a parte do e-mail antes do @.
+  // Vazio = a tela mostra o texto padrão do Figma.
   const [nomeUsuario, setNomeUsuario] = useState(INICIAL.nome);
-  // Como o visual é escolhido: 'automatico' (segue o relógio), 'dia' ou 'noite'.
+  // 'automatico' (segue o relógio), 'dia' ou 'noite'.
   const [modoTema, setModoTema] = useState(INICIAL.tema);
-  // Preferências da página Data e Hora. Nenhuma tela as usa ainda.
+  // Página Data e Hora (nenhuma tela usa ainda).
   // primeiroDiaSemana: 'domingo' ou 'segunda'. formatoHora: '24h' ou '12h'.
   const [primeiroDiaSemana, setPrimeiroDiaSemana] = useState(INICIAL.primeiroDia);
   const [formatoHora, setFormatoHora] = useState(INICIAL.formatoHora);
-  // Chaves da página Notificações. É só demonstração: ligar ou desligar aqui não
-  // envia, agenda nem pede permissão de nenhum aviso.
+  // Chaves da página Notificações. É só de mostra: não envia nenhum aviso.
   const [avisosDemo, setAvisosDemo] = useState(INICIAL.avisos);
   // Categorias criadas pelo usuário (além das três fixas). No máximo três.
   const [categoriasNovas, setCategoriasNovas] = useState(INICIAL.categorias);
+  // Cada tarefa: { id, titulo, categoriaId, data, concluida, excluida }
+  // - data: 'AAAA-MM-DD', igual ao calendário.
+  // - excluida: a tarefa vai para a lixeira (Tarefas Excluídas) em vez de sumir.
+  const [tarefas, setTarefas] = useState(INICIAL.tarefas);
+  // Dia tocado no Calendário ('AAAA-MM-DD'). Fica aqui porque o calendário, a
+  // lista de tarefas e o botão + usam. Não é salvo: ao abrir o app, volta para hoje.
+  const [diaSelecionado, setDiaSelecionado] = useState(dataDeHoje);
   const [menuAberto, setMenuAberto] = useState(false);
-  // O desfoque do vidro de Configurações precisa de um ref para a área que fica
-  // atrás dele. O menu e o vidro deslizam com estes valores (0 = aberto,
-  // 1 = fora da tela). Ficam aqui porque a tela inicial e as rotas de opções
-  // usam os três: uma tela anima a saída e a outra anima a entrada.
-  // A função dentro do useState faz cada Animated.Value ser criado uma vez só.
+  // Ref da área atrás do vidro de Configurações (o desfoque precisa dela).
+  // O menu e o vidro deslizam com estes valores: 0 = aberto, 1 = fora da tela.
+  // A função no useState cria cada Animated.Value uma vez só.
   const alvoDesfoque = useRef(null);
   const [deslizeMenu] = useState(function () {
     return new Animated.Value(1);
@@ -74,87 +63,110 @@ export function OpcoesProvider({ children }) {
   const [deslizeConfig] = useState(function () {
     return new Animated.Value(1);
   });
-  // Deslize entre as páginas principais 
-  
+  // Deslize entre a página inicial e o Calendário (aula 02, Animated).
+  // 0 = página inicial na tela, 1 = Calendário na tela.
+  // As duas páginas usam o mesmo valor, então andam juntas.
   const [deslizeAba] = useState(function () {
     return new Animated.Value(0);
   });
-  // Qual página principal está aberta por baixo das opções: '/' ou '/calendario'.
-
+  // Página principal aberta por baixo das opções: '/' ou '/calendario'.
+  // É useRef porque nenhuma tela mostra esse valor; ele só é lido na hora de voltar.
   const rotaPrincipal = useRef('/');
 
-  // Ao abrir o app, lê o que foi salvo da última vez. A lista vazia no fim faz
-  // isto rodar uma vez só. O que nunca foi salvo continua com o valor inicial.
-  useEffect(function () {
-    async function carregarTudo() {
-      try {
-        const nome = await carregar(CHAVES.nome);
-        if (nome !== null) setNomeUsuario(nome);
-        const tema = await carregar(CHAVES.tema);
-        if (tema !== null) setModoTema(tema);
-        const primeiroDia = await carregar(CHAVES.primeiroDia);
-        if (primeiroDia !== null) setPrimeiroDiaSemana(primeiroDia);
-        const hora = await carregar(CHAVES.formatoHora);
-        if (hora !== null) setFormatoHora(hora);
-        const avisos = await carregar(CHAVES.avisos);
-        if (avisos !== null) setAvisosDemo(avisos);
-        const novas = await carregar(CHAVES.categorias);
-        if (novas !== null) {
-          // Versões anteriores salvavam só o nome de cada categoria.
+  // Carrega o que a pessoa logada salvou.
+  // Diferente da aula 05, a lista é [emailLogado]: roda ao abrir o app e de novo
+  // toda vez que alguém entra, sai ou troca de conta.
+  useEffect(
+    function () {
+      // Ninguém logado: não tem o que carregar.
+      if (emailLogado === null) return;
+
+      // Usa o valor salvo ou o inicial, para nada da conta anterior ficar para trás.
+      function salvoOuInicial(valor, inicial) {
+        return valor !== null ? valor : inicial;
+      }
+
+      async function carregarTudo() {
+        try {
+          const nome = await carregar(chaveDoUsuario(emailLogado, 'nome'));
+          setNomeUsuario(salvoOuInicial(nome, INICIAL.nome));
+          const tema = await carregar(chaveDoUsuario(emailLogado, 'tema'));
+          setModoTema(salvoOuInicial(tema, INICIAL.tema));
+          const primeiroDia = await carregar(chaveDoUsuario(emailLogado, 'primeiroDia'));
+          setPrimeiroDiaSemana(salvoOuInicial(primeiroDia, INICIAL.primeiroDia));
+          const hora = await carregar(chaveDoUsuario(emailLogado, 'formatoHora'));
+          setFormatoHora(salvoOuInicial(hora, INICIAL.formatoHora));
+          const avisos = await carregar(chaveDoUsuario(emailLogado, 'avisos'));
+          setAvisosDemo(salvoOuInicial(avisos, INICIAL.avisos));
+          const novas = await carregar(chaveDoUsuario(emailLogado, 'categorias'));
+          // Categoria salva só como texto vira { id, nome }.
           setCategoriasNovas(
-            novas.map(function (categoria, indice) {
+            salvoOuInicial(novas, INICIAL.categorias).map(function (categoria, indice) {
               if (typeof categoria === 'string') {
                 return { id: 'antiga-' + indice, nome: categoria };
               }
               return categoria;
             })
           );
+          const tarefasSalvas = await carregar(chaveDoUsuario(emailLogado, 'tarefas'));
+          setTarefas(salvoOuInicial(tarefasSalvas, INICIAL.tarefas));
+        } catch (erro) {
+          console.warn('Não foi possível carregar os dados salvos', erro);
         }
-      } catch (erro) {
-        console.warn('Não foi possível carregar os dados salvos', erro);
       }
-    }
-    carregarTudo();
-  }, []);
+      carregarTudo();
+    },
+    [emailLogado]
+  );
+
+  // Salva um dado na chave do usuário logado. Sem ninguém logado, não salva.
+  function salvarDoUsuario(campo, valor) {
+    if (emailLogado === null) return;
+    salvar(chaveDoUsuario(emailLogado, campo), valor);
+  }
 
   const categorias = CATEGORIAS_FIXAS.concat(categoriasNovas);
+  // Tarefas fora da lixeira. É calculado a partir de `tarefas` (aula 05), e não
+  // guardado em outro estado, então nunca fica desatualizado.
+  const tarefasAtivas = tarefas.filter(function (tarefa) {
+    return !tarefa.excluida;
+  });
 
-  // Todas as funções de alterar seguem o fluxo da aula 05: criar o valor novo,
-  // atualizar o estado e depois salvar.
+  // As funções de alterar seguem a aula 05: monta o valor novo, atualiza o
+  // estado e salva.
   function mudarNome(novo) {
     setNomeUsuario(novo);
-    salvar(CHAVES.nome, novo);
+    salvarDoUsuario('nome', novo);
   }
 
   function escolherTema(novo) {
     setModoTema(novo);
-    salvar(CHAVES.tema, novo);
+    salvarDoUsuario('tema', novo);
   }
 
   function escolherPrimeiroDia(novo) {
     setPrimeiroDiaSemana(novo);
-    salvar(CHAVES.primeiroDia, novo);
+    salvarDoUsuario('primeiroDia', novo);
   }
 
   function escolherFormatoHora(novo) {
     setFormatoHora(novo);
-    salvar(CHAVES.formatoHora, novo);
+    salvarDoUsuario('formatoHora', novo);
   }
 
   function alternarAviso(chave) {
-    // Copia o objeto e troca só a chave tocada (não mudamos o estado antigo).
+    // Copia o objeto e troca só a chave tocada, sem mexer no antigo.
     const novos = { ...avisosDemo, [chave]: !avisosDemo[chave] };
     setAvisosDemo(novos);
-    salvar(CHAVES.avisos, novos);
+    salvarDoUsuario('avisos', novos);
   }
 
   function adicionarCategoria(nome) {
-    // O id usa a hora em milissegundos, como na aula 03: não se repete entre
-    // duas categorias criadas pela mesma pessoa.
+    // O id usa a hora em milissegundos, como na aula 03.
     const nova = { id: Date.now().toString(), nome: nome };
     const novas = categoriasNovas.concat([nova]);
     setCategoriasNovas(novas);
-    salvar(CHAVES.categorias, novas);
+    salvarDoUsuario('categorias', novas);
   }
 
   // Só as categorias criadas pelo usuário podem ser excluídas.
@@ -163,7 +175,7 @@ export function OpcoesProvider({ children }) {
       return categoria.id !== id;
     });
     setCategoriasNovas(novas);
-    salvar(CHAVES.categorias, novas);
+    salvarDoUsuario('categorias', novas);
   }
 
   function buscarCategoriaPorId(id) {
@@ -172,8 +184,70 @@ export function OpcoesProvider({ children }) {
     });
   }
 
-  // O caminho de ida, espelho de voltarAoMenu: se o menu está aberto, ele sai da
-  // tela primeiro; só quando essa animação termina é que o vidro entra.
+  // ---------------------------------------------------------------------------
+  // TAREFAS (aulas 02 e 05). Todas montam uma lista nova (concat, map ou filter
+  // não mexem na antiga) e passam para salvarTarefas, que atualiza a tela e salva.
+  // Salvamos `novaLista` porque `tarefas` só muda no próximo desenho.
+  // ---------------------------------------------------------------------------
+  function salvarTarefas(novaLista) {
+    setTarefas(novaLista);
+    salvarDoUsuario('tarefas', novaLista);
+  }
+
+  function adicionarTarefa(titulo, categoriaId, data) {
+    const nova = {
+      id: Date.now().toString(),
+      titulo: titulo,
+      categoriaId: categoriaId,
+      data: data,
+      concluida: false,
+      excluida: false,
+    };
+    salvarTarefas(tarefas.concat([nova]));
+  }
+
+  // map devolve a lista inteira; só a tarefa tocada troca o `concluida`.
+  function alternarConcluida(id) {
+    salvarTarefas(
+      tarefas.map(function (tarefa) {
+        return tarefa.id === id ? { ...tarefa, concluida: !tarefa.concluida } : tarefa;
+      })
+    );
+  }
+
+  // Excluir só marca a tarefa: ela vai para Tarefas Excluídas.
+  function excluirTarefa(id) {
+    salvarTarefas(
+      tarefas.map(function (tarefa) {
+        return tarefa.id === id ? { ...tarefa, excluida: true } : tarefa;
+      })
+    );
+  }
+
+  function restaurarTarefa(id) {
+    salvarTarefas(
+      tarefas.map(function (tarefa) {
+        return tarefa.id === id ? { ...tarefa, excluida: false } : tarefa;
+      })
+    );
+  }
+
+  // Apagar de vez: filter devolve a lista SEM a tarefa desse id.
+  function apagarTarefa(id) {
+    salvarTarefas(
+      tarefas.filter(function (tarefa) {
+        return tarefa.id !== id;
+      })
+    );
+  }
+
+  function buscarTarefaPorId(id) {
+    return tarefas.find(function (tarefa) {
+      return tarefa.id === id;
+    });
+  }
+
+  // Abre as opções. Se o menu está aberto, ele sai primeiro e só depois o vidro entra.
   function entrarNasOpcoes() {
     deslizeConfig.setValue(1);
     function entrarVidro() {
@@ -189,9 +263,9 @@ export function OpcoesProvider({ children }) {
     }
   }
 
-  /* Fecha as opções e volta para o menu. Primeiro o vidro sai da tela; só quando
-  // essa animação termina é que o menu abre*/
-
+  // Fecha as opções: primeiro o vidro sai, depois o menu abre e volta para a
+  // página principal certa ('/' ou '/calendario').
+  // `depois` é opcional. O typeof existe porque o onPress manda o evento aqui.
   function voltarAoMenu(depois) {
     animarPainel(deslizeConfig, 1, function () {
       setMenuAberto(true);
@@ -200,35 +274,35 @@ export function OpcoesProvider({ children }) {
     });
   }
 
-  // Ida para o Calendário: leva o valor de 0 para 1 em 280 ms.
- 
+  // Desliza o Calendário para dentro (0 -> 1). A PaginaCalendario chama ao abrir.
   function entrarNoCalendario() {
     rotaPrincipal.current = '/calendario';
     animarPainel(deslizeAba, 1);
   }
 
-  // Chamada pela PaginaCalendario quando ela sai da tela
-  // Deixa tudo pronto para a próxima entrada: o valor volta para 0 (página
-  
+  // A PaginaCalendario chama quando fecha, até sem animação (botão voltar do
+  // Android). Deixa tudo pronto para a próxima vez.
   function sairDoCalendario() {
     deslizeAba.setValue(0);
     rotaPrincipal.current = '/';
   }
 
-  // Volta do Calendário para a página inicial. A ordem importa, e é a mesma de
-  // voltarAoMenu:
-
+  // Volta para a página inicial. A ordem importa: primeiro as páginas deslizam,
+  // só depois a rota /calendario sai. Senão o Calendário some sem deslizar.
   function voltarAoInicio() {
     animarPainel(deslizeAba, 0, function () {
       router.dismissTo('/');
     });
   }
 
-  // Tira cada chave do aparelho e volta os valores ao início.
+  // Apaga os dados do usuário logado e volta tudo ao início.
+  // A pessoa continua logada, só que com os dados zerados.
   async function apagarDadosSalvos() {
     try {
-      for (const chave of Object.values(CHAVES)) {
-        await AsyncStorage.removeItem(chave);
+      if (emailLogado !== null) {
+        for (const campo of CAMPOS_DO_USUARIO) {
+          await AsyncStorage.removeItem(chaveDoUsuario(emailLogado, campo));
+        }
       }
     } catch (erro) {
       console.warn('Não foi possível apagar os dados salvos', erro);
@@ -239,6 +313,7 @@ export function OpcoesProvider({ children }) {
     setFormatoHora(INICIAL.formatoHora);
     setAvisosDemo(INICIAL.avisos);
     setCategoriasNovas(INICIAL.categorias);
+    setTarefas(INICIAL.tarefas);
   }
 
   return (
@@ -258,6 +333,16 @@ export function OpcoesProvider({ children }) {
         adicionarCategoria,
         excluirCategoria,
         buscarCategoriaPorId,
+        tarefas,
+        tarefasAtivas,
+        adicionarTarefa,
+        alternarConcluida,
+        excluirTarefa,
+        restaurarTarefa,
+        apagarTarefa,
+        buscarTarefaPorId,
+        diaSelecionado,
+        setDiaSelecionado,
         apagarDadosSalvos,
         menuAberto,
         setMenuAberto,
@@ -277,7 +362,7 @@ export function OpcoesProvider({ children }) {
   );
 }
 
-
+// Atalho para as telas lerem o Context. Dá um erro claro se a tela estiver fora do Provider.
 export function useOpcoes() {
   const contexto = useContext(OpcoesContext);
   if (!contexto) {

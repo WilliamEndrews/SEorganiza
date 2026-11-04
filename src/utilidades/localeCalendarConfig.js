@@ -1,3 +1,5 @@
+// Tradução do react-native-calendars para português (CalendarioMes.js usa).
+// dayNamesShort são os nomes das colunas: "Dom", "Seg"... como no Figma.
 export const ptBR = {
   monthNames: [
     "Janeiro",
@@ -37,13 +39,13 @@ export const ptBR = {
     "Sábado",
   ],
   dayNamesShort: [
-    "DOM",
-    "SEG",
-    "TER",
-    "QUA",
-    "QUI",
-    "SEX",
-    "SÁB",
+    "Dom",
+    "Seg",
+    "Ter",
+    "Qua",
+    "Qui",
+    "Sex",
+    "Sáb",
   ],
-  today: "Hoje"
+  today: "Hoje",
 };

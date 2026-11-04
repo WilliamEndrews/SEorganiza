@@ -3,17 +3,16 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { estilosConfig } from '../configuracoes/estilosConfig';
 
-// As linhas que vão dentro dos retângulos de vidro (GrupoVidro) de Configurações.
-// Ficam juntas porque são pequenas e usam os mesmos estilos de linha.
+// Linhas que vão dentro dos retângulos de vidro (GrupoVidro) de Configurações.
+// Ficam juntas aqui porque são pequenas e usam os mesmos estilos.
 
 function destinoPendente() {
-  // As páginas de cada item ainda não existem. O toque só mostra o feedback.
+  // A página ainda não existe, então o toque só mostra o efeito de apertar.
 }
 
-// Uma linha de Configurações: ícone + título + seta.
-// A linha inteira é um Pressable, então tocar em qualquer parte dela funciona.
-// O ícone chega pronto pela prop `icone`, porque cada linha usa um desenho diferente.
-// `aoPressionar` diz o que acontece no toque. Sem ela, a linha ainda não leva a lugar nenhum.
+// Linha de Configurações: ícone + título + seta. A linha toda é um Pressable.
+// `icone` chega pronto porque cada linha tem um desenho diferente.
+// `aoPressionar` é o que acontece no toque. Sem ela, a linha ainda não leva a nada.
 export function BotaoConfig({ icone, titulo, aoPressionar = null }) {
   return (
     <Pressable
@@ -32,11 +31,9 @@ export function BotaoConfig({ icone, titulo, aoPressionar = null }) {
   );
 }
 
-// Uma opção para escolher: nome + marca de seleção, e um desenho se for passado.
-// Serve para as páginas Temas e Data e Hora. Só uma opção do grupo fica marcada.
-// A seleção aparece de três jeitos, para não depender só da cor:
-// círculo com visto (em vez de círculo vazio), texto em negrito e,
-// quando há desenho, um contorno nele.
+// Opção para escolher (páginas Temas e Data e Hora). Só uma do grupo fica marcada.
+// A marcada não depende só da cor: tem o visto, o texto em negrito e,
+// se tiver desenho, um contorno nele.
 export function OpcaoEscolha({ titulo, desenho = null, selecionado, aoEscolher }) {
   return (
     <Pressable
@@ -74,9 +71,8 @@ export function OpcaoEscolha({ titulo, desenho = null, selecionado, aoEscolher }
   );
 }
 
-// Uma linha com chave de liga e desliga. A linha inteira é um botão do tipo "switch".
-// A chave é desenhada à mão (trilho + bolinha) para ficar igual em todas as plataformas.
-// Ligado ou desligado aparece pela posição da bolinha e pelo texto, não só pela cor.
+// Linha com chave de liga e desliga. A chave é feita à mão (trilho + bolinha)
+// para ficar igual no celular e na web. O texto "Ligado"/"Desligado" ajuda quem não vê a cor.
 export function LinhaChave({ titulo, ligado, aoAlternar }) {
   return (
     <Pressable
@@ -97,8 +93,8 @@ export function LinhaChave({ titulo, ligado, aoAlternar }) {
   );
 }
 
-// Uma linha só de leitura: nome do dado à esquerda e o número à direita.
-// Não é botão (não leva a lugar nenhum). O leitor de tela lê "Total de tarefas: 0".
+// Linha só de leitura: nome à esquerda, valor à direita. Não é botão.
+// O leitor de tela lê tudo junto, tipo "Total de tarefas: 0".
 export function LinhaDado({ titulo, valor }) {
   return (
     <View accessible accessibilityLabel={titulo + ': ' + valor} style={estilosConfig.linhaConfig}>
@@ -108,8 +104,8 @@ export function LinhaDado({ titulo, valor }) {
   );
 }
 
-// Uma linha só de leitura da página Acessibilidade: ícone, título e explicação.
-// Não é botão. O leitor de tela lê o título e o texto juntos.
+// Linha só de leitura da página Acessibilidade: ícone, título e explicação.
+// O leitor de tela lê o título e o texto juntos.
 export function LinhaInfo({ icone, titulo, texto }) {
   return (
     <View accessible accessibilityLabel={titulo + '. ' + texto} style={styles.linhaInfo}>
@@ -123,7 +119,7 @@ export function LinhaInfo({ icone, titulo, texto }) {
 }
 
 const styles = StyleSheet.create({
-  // Opção com desenho (página Temas). Medidas minhas.
+  // Opção com desenho (página Temas). Medidas nossas.
   linhaTema: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -147,8 +143,7 @@ const styles = StyleSheet.create({
   textoSelecionado: {
     fontWeight: '700',
   },
-  // Chave de liga e desliga da página Notificações. Medidas minhas (parecidas com
-  // as de um interruptor comum), pois o Figma não desenha essa página.
+  // Chave da página Notificações. Medidas nossas, o Figma não tem essa página.
   textoEstadoChave: {
     marginRight: 10,
     color: '#000000',
@@ -174,13 +169,17 @@ const styles = StyleSheet.create({
   bolinhaLigada: {
     alignSelf: 'flex-end',
   },
-  // Número à direita de cada linha das páginas Dados, Perfil e Sobre.
+  // Valor à direita nas páginas Dados, Perfil e Sobre.
+  // flexShrink deixa o texto encolher, senão o e-mail estoura a linha.
   valorDado: {
+    flexShrink: 1,
+    marginLeft: 12,
     color: '#000000',
     fontSize: 24,
     fontWeight: '700',
+    textAlign: 'right',
   },
-  // Linha da página Acessibilidade. Medidas minhas.
+  // Linha da página Acessibilidade. Medidas nossas.
   linhaInfo: {
     flexDirection: 'row',
     alignItems: 'flex-start',

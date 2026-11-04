@@ -1,6 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Animated, Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Dimensions, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Link, Stack, ThemeProvider, usePathname } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,32 +19,22 @@ import { TEMA_NAVEGACAO_TRANSPARENTE } from '../../constantes/navegacao';
 import { useOpcoes } from '../../contexto/OpcoesContext';
 import { animarPainel } from '../../utilidades/animarPainel';
 import PainelOpcoes from '../../menu/PainelOpcoes';
+import BolhaNovaTarefa from '../../inicio/BolhaNovaTarefa';
+import { dataDeHoje } from '../../utilidades/ajudantes';
 
-/*
- LAYOUT DO GRUPO (principal): a "moldura" das páginas principais.
-*/
+// Layout do grupo (principal) (aula 03 - Expo Router).
+// Tudo o que fica aqui aparece nas duas rotas e fica parado: fundo, sol/lua,
+// botão +, barra de baixo e menu. Só o "palco" muda: é onde o Stack desenha
+// a rota atual ("/" ou "/calendario"), que é a parte que desliza.
 
-
-
-/* - Aqui no layout (fica PARADO): o degradê do fundo, o véu da noite, o sol ou a
-  lua, o botão +, a barra de baixo e o menu de opções.
-  Nas rotas (é o que vai DESLIZAR):
-    index.js      -> "/"           título "Seja bem vindo" e tarefas
-    calendario.js -> "/calendario" logo, calendário e tarefas
-
-*/
-
-/* Este código veio quase todo da TelaInicial: a única diferença é que, no lugar
- do título e do card, agora existe o "palco", onde o Stack desenha a rota atual*/
-
+// Se abrirem /calendario direto (link ou F5), a rota "/" entra por baixo.
+// Assim a prancheta sempre tem para onde voltar.
 export const unstable_settings = {
   anchor: 'index',
 };
 
 export default function LayoutPrincipal() {
-  /* O tema, o nome, as categorias e o menu aberto vêm do Context, porque as
- rotas de opções também leem e alteram esses valores.*/
-
+  // Vem do Context porque as telas de opções também usam esses valores.
   const {
     nomeUsuario,
     modoTema,
@@ -55,12 +45,12 @@ export default function LayoutPrincipal() {
     alvoDesfoque,
     deslizeMenu: deslize,
     voltarAoInicio,
+    adicionarTarefa,
+    diaSelecionado,
   } = useOpcoes();
   const tela = Dimensions.get('window');
   const tema = temaDoModo(modoTema);
-  /* usePathname (Expo Router) devolve o endereço atual, por exemplo "/" ou
-   "/calendario". Com ele a barra sabe qual aba está ativa.*/
-
+  // usePathname dá o endereço atual. Serve para saber qual aba está ativa.
   const noCalendario = usePathname() === '/calendario';
   const escalaX = tela.width / TELA_LARGURA;
   const escalaY = tela.height / TELA_ALTURA;
@@ -69,10 +59,8 @@ export default function LayoutPrincipal() {
   const esquerdaPainel = PAINEL_X * escalaX;
   const topoPainel = PAINEL_Y * escalaY;
 
-  /* O menu abre deslizando sempre que `aberto` vira true, venha a mudança daqui
-   (botão da barra) ou do Context (voltar das opções). Quem fecha com animação
-   (fecharMenu e entrarNasOpcoes) só muda `aberto` para false no fim.*/
-   
+  // Sempre que `aberto` vira true (daqui ou voltando das opções), o menu
+  // entra deslizando.
   useEffect(
     function () {
       if (aberto) animarPainel(deslize, 0);
@@ -81,7 +69,7 @@ export default function LayoutPrincipal() {
     [aberto, deslize]
   );
 
-  // Para fechar com animação, `aberto` só vira false quando o menu já saiu.
+  // Só marca como fechado depois que o menu terminou de sair.
   function fecharMenu() {
     animarPainel(deslize, 1, function () {
       setAberto(false);
@@ -98,6 +86,38 @@ export default function LayoutPrincipal() {
     outputRange: [esquerdaPainel, tela.width],
   });
 
+  // Bolha "Nova tarefa" do botão +. bolhaNaTela diz se ela aparece e
+  // aparecerBolha anima (0 = escondida, 1 = na tela).
+  // No Calendário a tarefa vai para o dia escolhido; na inicial, para hoje.
+  const dataNova = noCalendario ? diaSelecionado : dataDeHoje();
+  const [bolhaNaTela, setBolhaNaTela] = useState(false);
+  const [aparecerBolha] = useState(function () {
+    return new Animated.Value(0);
+  });
+
+  function abrirBolha() {
+    setBolhaNaTela(true);
+    aparecerBolha.setValue(0);
+    Animated.timing(aparecerBolha, {
+      toValue: 1,
+      duration: 320,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: true,
+    }).start();
+  }
+
+  // Só tira a bolha depois que a animação de saída acaba.
+  function fecharBolha() {
+    Animated.timing(aparecerBolha, {
+      toValue: 0,
+      duration: 220,
+      easing: Easing.in(Easing.cubic),
+      useNativeDriver: true,
+    }).start(function () {
+      setBolhaNaTela(false);
+    });
+  }
+
   return (
     <LinearGradient colors={tema.fundo} locations={tema.posicoes} style={styles.tela}>
       <BlurTargetView ref={alvoDesfoque} style={styles.alvo}>
@@ -111,20 +131,13 @@ export default function LayoutPrincipal() {
           style={[styles.astro, { right: tema.astro.direita, top: tema.astro.topo }]}
         />
 
-        {/* PALCO: a única parte da moldura que muda quando a rota muda.
-            O <Stack> desenha aqui dentro a rota atual ("/" ou "/calendario").
-             headerShown: false -> sem a barra de título padrão; cada página
-              desenha o próprio topo, como no Figma.
-             animation: 'none' -> o Router troca as rotas sem animação própria.
-              Quem anima é o código, igual às opções.
-             contentStyle e ThemeProvider transparentes -> as rotas não pintam
-              fundo, então o degradê da moldura aparece atrás delas. */}
-              
-
-
+        {/* Palco: o Stack desenha aqui a rota atual.
+            animation 'none' porque quem anima o deslize é o nosso código.
+            Fundo transparente para o degradê aparecer atrás das páginas. */}
         <View style={styles.palco}>
           <ThemeProvider value={TEMA_NAVEGACAO_TRANSPARENTE}>
             <Stack
+              id={undefined}
               screenOptions={{
                 headerShown: false,
                 animation: 'none',
@@ -132,14 +145,9 @@ export default function LayoutPrincipal() {
               }}
             >
               <Stack.Screen name="index" />
-
-              {/* presentation 'containedTransparentModal':
-                  - "Transparent": o Calendário abre POR CIMA da rota "/" sem
-                    escondê-la. A página inicial continua desenhada por baixo, e
-                    isso é necessário para as duas deslizarem ao mesmo tempo.
-                  - "Contained": a tela fica presa ao palco. No iOS, sem isso, ela
-                    cobriria a tela inteira, inclusive a barra de baixo. */}
-
+              {/* O Calendário abre por cima da inicial sem escondê-la, para as
+                  duas deslizarem juntas. "Contained" segura a tela dentro do
+                  palco (no iOS ela cobriria a barra de baixo). */}
               <Stack.Screen
                 name="calendario"
                 options={{ presentation: 'containedTransparentModal' }}
@@ -147,29 +155,26 @@ export default function LayoutPrincipal() {
             </Stack>
           </ThemeProvider>
 
-          {/* O + fica na moldura porque está no mesmo lugar nas duas telas do
-              Figma: assim ele não desliza junto com as páginas.
-              pointerEvents 'box-none': a faixa invisível que centraliza o botão
-              não rouba os toques; só o próprio botão recebe toque. */}
-
+          {/* O + fica aqui para não deslizar junto com as páginas.
+              'box-none' deixa só o botão receber toque, não a faixa em volta. */}
           <View style={styles.areaAdicionar}>
-            <View style={styles.botaoAdicionar}>
+            <Pressable
+              style={styles.botaoAdicionar}
+              onPress={abrirBolha}
+              accessibilityRole="button"
+              accessibilityLabel="Nova tarefa"
+            >
               <View style={styles.anel}>
                 <Text style={styles.mais}>+</Text>
               </View>
-            </View>
+            </Pressable>
           </View>
         </View>
 
         <View style={[styles.rodape, { backgroundColor: tema.barra }]}>
           <View style={[styles.onda, { backgroundColor: tema.barra }]} />
 
-          {/* Prancheta: volta para a página inicial.
-              - disabled: na página inicial não há para onde voltar, então o
-                botão não faz nada.
-              - accessibilityState.selected: o leitor de tela anuncia qual aba
-                está ativa. */}
-
+          {/* Prancheta: volta para a inicial. Já na inicial, fica desativada. */}
           <Pressable
             style={styles.botaoBarra}
             onPress={voltarAoInicio}
@@ -180,9 +185,8 @@ export default function LayoutPrincipal() {
           >
             <Ionicons name="clipboard-outline" size={26} color="#ffffff" />
           </Pressable>
-
-
-
+          {/* asChild faz o Link usar o nosso Pressable como botão.
+              Com asChild o estilo não pode ser lista, por isso o flatten. */}
           <Link href="/calendario" asChild>
             <Pressable
               style={StyleSheet.flatten(styles.botaoBarra)}
@@ -247,6 +251,21 @@ export default function LayoutPrincipal() {
         />
       </Animated.View>
 
+      {bolhaNaTela ? (
+        <BolhaNovaTarefa
+          aparecer={aparecerBolha}
+          categorias={categorias}
+          data={dataNova}
+          aoAdicionar={function (titulo, categoriaId) {
+            adicionarTarefa(titulo, categoriaId, dataNova);
+            fecharBolha();
+          }}
+          aoFechar={fecharBolha}
+          escalaX={escalaX}
+          escalaY={escalaY}
+        />
+      ) : null}
+
       <StatusBar style={tema.barraDeStatus} />
     </LinearGradient>
   );
@@ -260,7 +279,7 @@ const styles = StyleSheet.create({
   alvo: {
     flex: 1,
   },
-  // Elipse do sol ou da lua.
+  // Sol ou lua: o raio de 50% deixa a caixa oval. A posição vem do tema.
   astro: {
     position: 'absolute',
     width: 161,
@@ -268,19 +287,16 @@ const styles = StyleSheet.create({
     borderRadius: '50%',
     pointerEvents: 'none',
   },
-  
+  // Véu por cima do fundo. Só o tema da noite usa.
   veuTema: {
     ...StyleSheet.absoluteFill,
     pointerEvents: 'none',
   },
-  // O palco ocupa todo o espaço acima da barra de baixo (flex: 1), o mesmo
-  // espaço que o antigo `conteudo` da TelaInicial ocupava.
+  // O palco ocupa todo o espaço acima da barra de baixo.
   palco: {
     flex: 1,
   },
-  /* Faixa da largura da tela, a 36 px da barra (a mesma distância de antes),
-   que centraliza o botão +.*/
-
+  // Faixa da largura da tela só para centralizar o botão +.
   areaAdicionar: {
     position: 'absolute',
     left: 0,
@@ -311,8 +327,7 @@ const styles = StyleSheet.create({
     fontSize: 36,
     lineHeight: 40,
   },
-  /* As cores de rodape e onda são trocadas pelo tema em tempo de execução.
-   Os valores do dia.*/
+  // As cores do rodapé e da onda vêm do tema. Aqui ficam as do dia.
   rodape: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',

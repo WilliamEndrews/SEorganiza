@@ -21,13 +21,11 @@ export default function PainelOpcoes({
     return valor * escalaY;
   }
 
-  // Medidas do Figma para as três primeiras linhas. Cada categoria extra empurra
-  // o resto do menu para baixo, no mesmo passo de 37.
+  // Medidas do Figma. Cada categoria nova empurra o resto do menu 37 para baixo.
   const PASSO_CATEGORIA = 37;
   const TOPO_PRIMEIRA = 166;
   const FOLGA_NOVA = 58;
-  // Sem a linha "Nova Categoria" (limite atingido), o divisor sobe para perto
-  // da última categoria.
+  // Quando bate o limite, some o "Nova Categoria" e o divisor sobe.
   const FOLGA_SEM_NOVA = 28;
   const FOLGA_DIVISOR = 40;
   const FOLGA_CONFIG = 12;
@@ -51,7 +49,7 @@ export default function PainelOpcoes({
   const [bolhaNaTela, setBolhaNaTela] = useState(false);
   const [nomeNovo, setNomeNovo] = useState('');
   const [avisoBolha, setAvisoBolha] = useState('');
-  // A função dentro do useState faz o Animated.Value ser criado uma vez só.
+  // Passando uma função pro useState, o Animated.Value é criado uma vez só.
   const [aparecerBolha] = useState(function () {
     return new Animated.Value(0);
   });
@@ -146,8 +144,8 @@ export default function PainelOpcoes({
         Categorias
       </Text>
 
-      {/* Cada categoria abre a rota /categoria/[id]. A área de toque começa 6 acima
-          do texto e tem 34 de altura, para não encostar na categoria vizinha. */}
+      {/* Cada categoria abre /categoria/[id]. A área de toque tem 34 de altura
+          para não encostar na categoria vizinha. */}
       {categorias.map(function (categoria, indice) {
         const topo = topoCategoria(indice);
         return (
@@ -200,8 +198,8 @@ export default function PainelOpcoes({
 
       <View style={[styles.divisor, { left: x(5), top: y(topoDivisor2), width: x(277) }]} />
 
-      {/* O Link com asChild não aceita uma lista de estilos no filho; o flatten junta
-          a lista num objeto só. */}
+      {/* Link com asChild não aceita lista de estilos no filho, então o flatten
+          junta tudo num objeto só. */}
       <Link href="/configuracoes" asChild>
         <Pressable
           accessibilityRole="button"
@@ -222,7 +220,7 @@ export default function PainelOpcoes({
           </Text>
         </Pressable>
       </Link>
-      {/* As duas linhas de tarefas: a área de toque começa 10 acima do ícone e tem 46. */}
+      {/* Linhas de tarefas com área de toque de 46 de altura. */}
       <Link href="/tarefas/concluidas" asChild>
         <Pressable
           accessibilityRole="button"
@@ -319,8 +317,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingLeft: 9,
   },
-  // Linha que leva a uma rota. Os filhos continuam com posição absoluta, agora
-  // medida a partir do topo da linha.
+  // Linha que abre uma rota. A posição dos filhos conta a partir do topo dela.
   linhaLink: {
     position: 'absolute',
     left: 0,

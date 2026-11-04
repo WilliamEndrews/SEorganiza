@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import Avatar from '../componentes/Avatar';
 import CabecalhoPagina from '../componentes/CabecalhoPagina';
@@ -7,10 +7,9 @@ import { LinhaDado } from '../componentes/LinhasConfig';
 import { contarTarefas } from '../utilidades/ajudantes';
 import { estilosConfig } from './estilosConfig';
 
-// Página Perfil: perfil LOCAL. Sem login, e-mail ou senha, e sem conta.
-// O usuário só digita um nome. O círculo mostra a inicial dele (ainda não há foto).
-// Os contadores vêm da mesma lista real de tarefas da página Dados.
-export default function PaginaPerfil({ nomeUsuario, aoMudarNome, tarefas, aoVoltar }) {
+// Página Perfil da conta logada. Os números vêm da mesma lista de tarefas da página Dados.
+// `email` é só para ler (é o que identifica a conta). `aoSair` desloga.
+export default function PaginaPerfil({ nomeUsuario, email, aoMudarNome, aoSair, tarefas, aoVoltar }) {
   const { concluidas, pendentes } = contarTarefas(tarefas);
 
   return (
@@ -39,13 +38,25 @@ export default function PaginaPerfil({ nomeUsuario, aoMudarNome, tarefas, aoVolt
       </GrupoVidro>
 
       <GrupoVidro cor="azul" style={estilosConfig.grupo}>
+        <LinhaDado titulo="E-mail" valor={email} />
         <LinhaDado titulo="Tarefas concluídas" valor={concluidas} />
         <LinhaDado titulo="Tarefas pendentes" valor={pendentes} />
       </GrupoVidro>
 
+      <Pressable
+        onPress={aoSair}
+        accessibilityRole="button"
+        accessibilityLabel="Sair da conta"
+        style={function (estado) {
+          return [styles.botaoSair, estado.pressed ? styles.botaoPressionado : null];
+        }}
+      >
+        <Text style={styles.textoBotao}>Sair da conta</Text>
+      </Pressable>
+
       <Text style={estilosConfig.notaPagina}>
-        Perfil local: não há login, e-mail nem senha. O nome fica salvo só neste aparelho e
-        continua aqui quando o app fecha. Para apagá-lo, use Dados.
+        Esta conta fica salva só neste aparelho. O nome e as tarefas são desta conta. Sair
+        volta para o Login, e outra conta entra com os dados dela.
       </Text>
       <Text style={estilosConfig.notaPagina}>Escolher foto ainda não está disponível.</Text>
     </View>
@@ -57,13 +68,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 18,
   },
-  // Linha do nome. Medidas minhas.
+  // Linha do nome. Medidas nossas.
   rotuloNome: {
     color: '#000000',
     fontSize: 24,
   },
-  // minWidth 0: sem isso, na web o campo tem uma largura mínima própria, estoura a linha
-  // e empurra o painel para o lado quando recebe foco.
+  // minWidth 0: sem isso, na web o campo fica largo demais e empurra o painel pro lado.
   campoNome: {
     flex: 1,
     minWidth: 0,
@@ -73,5 +83,24 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontSize: 24,
     textAlign: 'right',
+  },
+  // "Sair da conta" não está no Figma. Copiamos o estilo do botão de apagar da página Dados.
+  botaoSair: {
+    minHeight: 46,
+    marginTop: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 13,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: '#D93025',
+  },
+  botaoPressionado: {
+    opacity: 0.7,
+  },
+  textoBotao: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '700',
   },
 });

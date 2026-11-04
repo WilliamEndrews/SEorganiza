@@ -1,10 +1,9 @@
 import { StyleSheet } from 'react-native';
 
-// Estilos usados por mais de uma parte do painel de Configurações:
-// a lista, as páginas internas e as linhas de src/componentes/LinhasConfig.js.
+// Estilos repetidos no painel de Configurações: a lista, as páginas internas
+// e as linhas de src/componentes/LinhasConfig.js.
 export const estilosConfig = StyleSheet.create({
-  // As medidas abaixo vêm das posições do Figma (tela de 403 px de largura).
-  // O painel mede 403 e os grupos têm 336, então sobram 33 px de cada lado.
+  // Medidas do Figma: painel de 403 px e grupos de 336, sobram 33 de cada lado.
   configMiolo: {
     flex: 1,
     paddingTop: 47,
@@ -17,13 +16,12 @@ export const estilosConfig = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 16,
   },
-  // O raio 13 foi medido na captura do Figma, não lido nas propriedades.
+  // Raio 13: medida nossa olhando o Figma.
   grupo: {
     borderRadius: 13,
     overflow: 'hidden',
   },
-  // Espaço embaixo de um bloco quando vem outro bloco ou título depois dele
-  // (Data e Hora, Perfil, Feedback e Sobre).
+  // Espaço embaixo de um bloco quando vem outro bloco ou título depois.
   grupoPagina: {
     marginBottom: 18,
   },
@@ -55,7 +53,7 @@ export const estilosConfig = StyleSheet.create({
     fontSize: 16,
     lineHeight: 22,
   },
-  // Texto explicativo embaixo dos blocos, usado em todas as páginas internas.
+  // Textinho explicativo embaixo dos blocos nas páginas internas.
   notaPagina: {
     marginTop: 14,
     paddingHorizontal: 4,

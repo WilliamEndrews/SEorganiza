@@ -7,12 +7,11 @@ import { LinhaDado } from '../componentes/LinhasConfig';
 import { contarTarefas } from '../utilidades/ajudantes';
 import { estilosConfig } from './estilosConfig';
 
-// Página Dados: contadores simples, calculados das listas reais de tarefas e categorias.
-// Nada é inventado: as tarefas ainda estão vazias; as categorias vêm do menu.
+// Página Dados: conta as tarefas e categorias de verdade, nada inventado.
 // Embaixo fica o botão que apaga tudo o que o app salvou no aparelho.
 export default function PaginaDados({ tarefas, categorias, aoApagarDados, aoVoltar }) {
   const { total, concluidas, pendentes } = contarTarefas(tarefas);
-  // O primeiro toque em "Apagar dados salvos" só pede confirmação.
+  // O primeiro toque em "Apagar dados salvos" só pergunta se tem certeza.
   const [confirmando, setConfirmando] = useState(false);
   const [apagado, setApagado] = useState(false);
 
@@ -35,8 +34,8 @@ export default function PaginaDados({ tarefas, categorias, aoApagarDados, aoVolt
 
       {total === 0 ? (
         <Text style={estilosConfig.notaPagina}>
-          Nenhuma tarefa cadastrada ainda. O app ainda não tem tela para criar tarefas, por isso
-          as tarefas mostram 0.
+          Nenhuma tarefa cadastrada ainda. Toque no botão + da tela inicial para criar a
+          primeira.
         </Text>
       ) : null}
       <Text style={estilosConfig.notaPagina}>
@@ -47,8 +46,8 @@ export default function PaginaDados({ tarefas, categorias, aoApagarDados, aoVolt
       {confirmando ? (
         <View style={styles.areaApagar}>
           <Text style={styles.avisoApagar}>
-            Isso apaga o nome, o tema, as preferências e as categorias que você criou. Tem
-            certeza?
+            Isso apaga o nome, o tema, as preferências, as categorias e as tarefas desta
+            conta. A conta e o login continuam. Tem certeza?
           </Text>
           <View style={styles.linhaBotoes}>
             <Pressable
@@ -115,7 +114,7 @@ export default function PaginaDados({ tarefas, categorias, aoApagarDados, aoVolt
   );
 }
 
-// Medidas minhas, pois o Figma não desenha essa página. Os botões seguem os do Feedback.
+// Medidas nossas (o Figma não tem essa página). Botões iguais aos do Feedback.
 const styles = StyleSheet.create({
   areaApagar: {
     marginTop: 18,
@@ -133,7 +132,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
   },
-  // Os dois botões da confirmação dividem a linha ao meio.
+  // Cancelar e Apagar dividem a linha ao meio.
   botaoNaLinha: {
     flex: 1,
   },

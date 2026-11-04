@@ -3,9 +3,8 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { estilosConfig } from '../configuracoes/estilosConfig';
 
-// Cabeçalho das páginas de opções: a seta e o título formam um botão só, que
-// volta para a tela anterior (a lista de Configurações ou o menu). O espaço vazio
-// à direita, do tamanho da seta, mantém o título centralizado.
+// Cabeçalho das páginas de opções: seta + título são um botão só que volta
+// para a tela anterior. O espaço vazio à direita deixa o título no centro.
 export default function CabecalhoPagina({
   titulo,
   aoVoltar,
@@ -26,8 +25,8 @@ export default function CabecalhoPagina({
 }
 
 const styles = StyleSheet.create({
-  // Medidas minhas, pois o Figma não desenha as páginas internas.
-  // O cabeçalho tem 44 de altura para a área de toque ficar confortável.
+  // Medidas nossas (o Figma não tem as páginas internas).
+  // Altura 44 para ficar fácil de tocar.
   cabecalhoPagina: {
     flexDirection: 'row',
     alignItems: 'center',

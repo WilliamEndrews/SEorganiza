@@ -3,9 +3,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { vidro } from '../constantes/figma';
 
-// Bolha de vidro que sobe de "Nova Categoria". O Figma não desenha essa aba:
-// o vidro reaproveita o mesmo estilo do menu, e a animação (opacidade + escala)
-// é minha. O fundo escurecido fecha a bolha se o usuário tocar fora dela.
+// Bolha de vidro que aparece ao tocar em "Nova Categoria" (não está no Figma).
+// Usa o mesmo vidro do menu. Tocar no fundo escuro, fora da bolha, fecha ela.
 export default function BolhaNovaCategoria({
   aparecer,
   nome,
@@ -120,7 +119,7 @@ export default function BolhaNovaCategoria({
   );
 }
 
-// Medidas minhas: o Figma não desenha essa aba.
+// Medidas nossas.
 const styles = StyleSheet.create({
   camadaBolha: {
     ...StyleSheet.absoluteFill,

@@ -5,10 +5,9 @@ import CabecalhoPagina from '../componentes/CabecalhoPagina';
 import GrupoVidro from '../componentes/GrupoVidro';
 import { estilosConfig } from './estilosConfig';
 
-// Página Feedback: um campo de texto e dois botões, Enviar e Cancelar.
-// O ENVIO NÃO ESTÁ CONECTADO: não existe servidor nem e-mail por trás.
-// Por isso, ao tocar em Enviar, o app só avisa isso com franqueza e mantém o texto.
-// O rascunho vive aqui dentro (useState local): se sair da página, ele se perde.
+// Página Feedback: um campo de texto, Enviar e Cancelar.
+// Ainda não tem servidor, então Enviar só mostra um aviso e mantém o texto.
+// O texto fica num useState daqui, então some se sair da página.
 export default function PaginaFeedback({ aoVoltar }) {
   const [texto, setTexto] = useState('');
   const [avisoVisivel, setAvisoVisivel] = useState(false);
@@ -16,17 +15,16 @@ export default function PaginaFeedback({ aoVoltar }) {
 
   function mudarTexto(novoTexto) {
     setTexto(novoTexto);
-    // Se o usuário voltou a escrever, o aviso anterior já não vale.
+    // Voltou a escrever: esconde o aviso antigo.
     setAvisoVisivel(false);
   }
 
   function aoEnviar() {
-    // Nada é enviado. Só mostramos o aviso.
+    // Nada é enviado de verdade, só aparece o aviso.
     setAvisoVisivel(true);
   }
 
   function aoCancelar() {
-    // Cancelar apaga o rascunho e volta para a lista.
     setTexto('');
     setAvisoVisivel(false);
     aoVoltar();
@@ -97,7 +95,7 @@ export default function PaginaFeedback({ aoVoltar }) {
   );
 }
 
-// Medidas minhas, pois o Figma não desenha essa página.
+// Medidas nossas (o Figma não tem essa página).
 const styles = StyleSheet.create({
   campoFeedback: {
     minHeight: 140,
@@ -134,7 +132,7 @@ const styles = StyleSheet.create({
   botaoEnviar: {
     backgroundColor: '#0088FF',
   },
-  // Desativado muda de cor E o leitor de tela fala "desativado" (accessibilityState).
+  // Desativado fica apagado, e o leitor de tela também avisa (accessibilityState).
   botaoDesativado: {
     opacity: 0.4,
   },

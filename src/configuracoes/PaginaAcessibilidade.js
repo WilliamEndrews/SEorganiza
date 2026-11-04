@@ -7,9 +7,8 @@ import { LinhaInfo } from '../componentes/LinhasConfig';
 import { COR_ICONE_AZUL } from '../constantes/figma';
 import { estilosConfig } from './estilosConfig';
 
-// Página Acessibilidade: não tem ajustes próprios. Só explica, com franqueza,
-// o que a tela de Configurações já faz. Os ajustes de verdade (tamanho de letra,
-// leitor de tela) ficam nas configurações do sistema do aparelho.
+// Página Acessibilidade: não tem ajustes, só explica o que o app já faz.
+// Tamanho de letra e leitor de tela se mudam nas configurações do celular.
 export default function PaginaAcessibilidade({ aoVoltar }) {
   return (
     <View style={estilosConfig.configMiolo}>

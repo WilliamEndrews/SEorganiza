@@ -14,8 +14,8 @@ import { estilosConfig } from './estilosConfig';
 export default function ListaConfiguracoes({ nomeUsuario, aoVoltar }) {
   return (
     <View style={estilosConfig.configMiolo}>
-      {/* O título é o jeito de voltar ao menu. A caixa mede 40 (24 do texto + 16 de
-          margem). O hitSlop soma 4 em cima e chega a 44, sem invadir a linha do perfil. */}
+      {/* Tocar no título volta ao menu. O hitSlop aumenta a área de toque
+          de 40 para 44 px sem encostar na linha do perfil. */}
       <Pressable
         onPress={aoVoltar}
         hitSlop={{ top: 4 }}
@@ -25,7 +25,7 @@ export default function ListaConfiguracoes({ nomeUsuario, aoVoltar }) {
         <Text style={estilosConfig.tituloConfig}>Configurações</Text>
       </Pressable>
 
-      {/* No Figma, a área do perfil também tem uma seta. Ela abre a página Perfil. */}
+      {/* A linha do perfil abre a página Perfil. */}
       <Pressable
         onPress={function () {
           router.push('/configuracoes/perfil');
@@ -52,7 +52,7 @@ export default function ListaConfiguracoes({ nomeUsuario, aoVoltar }) {
         />
       </GrupoVidro>
 
-      {/* Grupo 2: quatro preferências, com o mesmo degradê azul do grupo 1. */}
+      {/* Grupo 2: quatro preferências. */}
       <GrupoVidro cor="azul" style={[estilosConfig.grupo, styles.grupoPreferencias]}>
         <BotaoConfig
           icone={<MaterialCommunityIcons name="clock" size={24} color={COR_ICONE_AZUL} />}
@@ -84,7 +84,7 @@ export default function ListaConfiguracoes({ nomeUsuario, aoVoltar }) {
         />
       </GrupoVidro>
 
-      {/* Grupo 3: Feedback, Siga-nos e Sobre, com o degradê laranja. */}
+      {/* Grupo 3: Feedback, Siga-nos e Sobre, em laranja. */}
       <GrupoVidro cor="laranja" style={[estilosConfig.grupo, styles.grupoContato]}>
         <BotaoConfig
           icone={<MaterialIcons name="feedback" size={24} color={COR_ICONE_LARANJA} />}
@@ -124,12 +124,9 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 20,
   },
-  // Alturas dos três retângulos no Figma: 46, 184 e 147.
-  // São alturas MÍNIMAS (minHeight): com o texto do sistema maior, a linha cresce
-  // e o retângulo acompanha, em vez de cortar o texto.
-  // No grupo do meio, 4 linhas de 46 + 3 de respiro dão 187, e não 184 como no Figma
-  // (antes, esses 3 px eram cortados). Por isso a margem de baixo caiu de 9 para 6:
-  // o grupo seguinte fica no mesmo lugar.
+  // Alturas do Figma, mas como minHeight: se a fonte do celular for maior,
+  // o retângulo cresce junto em vez de cortar o texto.
+  // O grupo do meio passa 3 px do Figma, então a margem de baixo é 6 para compensar.
   grupoTemas: {
     minHeight: 46,
     marginBottom: 15,

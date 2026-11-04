@@ -4,10 +4,8 @@ import { Animated } from 'react-native';
 export const DURACAO_PAINEL = 280;
 
 // Desliza um painel até `destino` (0 = aberto, 1 = fora da tela).
-// useNativeDriver fica false porque os painéis animam `left`, e o driver nativo
-// não anima essa propriedade.
-// `aoTerminar` é opcional e só roda se a animação chegar ao fim (não roda se
-// outra animação a interromper no meio).
+// useNativeDriver é false porque animamos `left`, e o driver nativo não faz isso.
+// `aoTerminar` é opcional e só roda se a animação chegar ao fim.
 export function animarPainel(valor, destino, aoTerminar) {
   Animated.timing(valor, {
     toValue: destino,

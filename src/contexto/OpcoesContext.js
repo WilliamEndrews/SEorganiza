@@ -52,6 +52,9 @@ export function OpcoesProvider({ children }) {
   // Dia tocado no Calendário ('AAAA-MM-DD'). Fica aqui porque o calendário, a
   // lista de tarefas e o botão + usam. Não é salvo: ao abrir o app, volta para hoje.
   const [diaSelecionado, setDiaSelecionado] = useState(dataDeHoje);
+  // id da tarefa aberta para editar (segurando o card). null = nenhuma.
+  // Fica aqui porque quem segura é o card, mas quem mostra a bolha é o _layout.
+  const [idEmEdicao, setIdEmEdicao] = useState(null);
   const [menuAberto, setMenuAberto] = useState(false);
   // Ref da área atrás do vidro de Configurações (o desfoque precisa dela).
   // O menu e o vidro deslizam com estes valores: 0 = aberto, 1 = fora da tela.
@@ -206,6 +209,15 @@ export function OpcoesProvider({ children }) {
     salvarTarefas(tarefas.concat([nova]));
   }
 
+  // Troca só o nome e a categoria. O resto da tarefa continua igual.
+  function editarTarefa(id, titulo, categoriaId) {
+    salvarTarefas(
+      tarefas.map(function (tarefa) {
+        return tarefa.id === id ? { ...tarefa, titulo: titulo, categoriaId: categoriaId } : tarefa;
+      })
+    );
+  }
+
   // map devolve a lista inteira; só a tarefa tocada troca o `concluida`.
   function alternarConcluida(id) {
     salvarTarefas(
@@ -336,6 +348,7 @@ export function OpcoesProvider({ children }) {
         tarefas,
         tarefasAtivas,
         adicionarTarefa,
+        editarTarefa,
         alternarConcluida,
         excluirTarefa,
         restaurarTarefa,
@@ -343,6 +356,8 @@ export function OpcoesProvider({ children }) {
         buscarTarefaPorId,
         diaSelecionado,
         setDiaSelecionado,
+        idEmEdicao,
+        setIdEmEdicao,
         apagarDadosSalvos,
         menuAberto,
         setMenuAberto,

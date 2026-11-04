@@ -1,5 +1,12 @@
 import { useEffect } from 'react';
-import { Animated, Dimensions, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import {
+  Animated,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { Stack, ThemeProvider } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -25,7 +32,7 @@ export const unstable_settings = {
 // conteúdo do vidro.
 export default function LayoutOpcoes() {
   const { entrarNasOpcoes, voltarAoMenu, alvoDesfoque, deslizeConfig } = useOpcoes();
-  const tela = Dimensions.get('window');
+  const tela = useWindowDimensions();
   const escalaX = tela.width / TELA_LARGURA;
   const escalaY = tela.height / TELA_ALTURA;
   const esquerdaConfig = CONFIG_X * escalaX;

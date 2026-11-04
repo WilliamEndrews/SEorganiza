@@ -1,4 +1,4 @@
-import { Animated, Dimensions, StyleSheet, Text } from 'react-native';
+import { Animated, StyleSheet, Text, useWindowDimensions } from 'react-native';
 import { usePathname } from 'expo-router';
 import { temaDoModo } from '../constantes/temas';
 import { useOpcoes } from '../contexto/OpcoesContext';
@@ -7,9 +7,9 @@ import ListaCards from '../componentes/ListaCards';
 // Página inicial (rota "/"): só o título e as tarefas.
 // O fundo, o botão + e a barra de baixo ficam no _layout.js do grupo.
 export default function TelaInicial() {
-  const { modoTema, deslizeAba, tarefasAtivas, alternarConcluida, excluirTarefa } = useOpcoes();
+  const { modoTema, deslizeAba, tarefasAtivas, alternarConcluida, setIdEmEdicao } = useOpcoes();
   const tema = temaDoModo(modoTema);
-  const tela = Dimensions.get('window');
+  const tela = useWindowDimensions();
   // Com o Calendário aberto esta página continua por baixo, só fora da tela.
   const noCalendario = usePathname() === '/calendario';
 
@@ -36,7 +36,7 @@ export default function TelaInicial() {
         tema={tema}
         mensagemVazia="Nenhuma tarefa ainda. Toque no + para criar a primeira."
         aoConcluir={alternarConcluida}
-        aoExcluir={excluirTarefa}
+        aoEditar={setIdEmEdicao}
       />
     </Animated.View>
   );

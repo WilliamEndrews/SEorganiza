@@ -7,18 +7,11 @@ import { CATEGORIAS_FIXAS, LIMITE_CATEGORIAS_NOVAS } from '../constantes/dados';
 import { inicialDoNome, nomeParaExibir } from '../utilidades/ajudantes';
 import BolhaNovaCategoria from './BolhaNovaCategoria';
 
-export default function PainelOpcoes({
-  escalaX,
-  escalaY,
-  nomeUsuario,
-  categorias,
-  aoAdicionarCategoria,
-}) {
-  function x(valor) {
-    return valor * escalaX;
-  }
-  function y(valor) {
-    return valor * escalaY;
+export default function PainelOpcoes({ escala, nomeUsuario, categorias, aoAdicionarCategoria }) {
+  // Converte uma medida do Figma para a tela atual. A mesma escala vale para
+  // largura e altura, então nada estica no tablet.
+  function medida(valor) {
+    return valor * escala;
   }
 
   // Medidas do Figma. Cada categoria nova empurra o resto do menu 37 para baixo.
@@ -108,17 +101,17 @@ export default function PainelOpcoes({
         style={[
           styles.foto,
           {
-            left: x(21),
-            top: y(26),
-            width: x(50),
-            height: x(50),
-            borderRadius: x(25),
+            left: medida(21),
+            top: medida(26),
+            width: medida(50),
+            height: medida(50),
+            borderRadius: medida(25),
             alignItems: 'center',
             justifyContent: 'center',
           },
         ]}
       >
-        <Text style={{ color: '#1C1C1C', fontSize: x(22), fontWeight: '700' }}>
+        <Text style={{ color: '#1C1C1C', fontSize: medida(22), fontWeight: '700' }}>
           {inicialDoNome(nomeUsuario)}
         </Text>
       </View>
@@ -126,21 +119,23 @@ export default function PainelOpcoes({
         numberOfLines={1}
         style={[
           styles.nomeUsuario,
-          { left: x(85), top: y(39), width: x(190), fontSize: y(18) },
+          { left: medida(85), top: medida(39), width: medida(190), fontSize: medida(18) },
         ]}
       >
         {nomeParaExibir(nomeUsuario)}
       </Text>
 
-      <View style={[styles.divisor, { left: x(5), top: y(91), width: x(277) }]} />
+      <View style={[styles.divisor, { left: medida(5), top: medida(91), width: medida(277) }]} />
 
       <Ionicons
         name="folder-outline"
-        size={x(22)}
+        size={medida(22)}
         color="#1C1C1C"
-        style={{ position: 'absolute', left: x(43), top: y(113) }}
+        style={{ position: 'absolute', left: medida(43), top: medida(113) }}
       />
-      <Text style={[styles.textoItem, { left: x(72), top: y(110), fontSize: y(18) }]}>
+      <Text
+        style={[styles.textoItem, { left: medida(72), top: medida(110), fontSize: medida(18) }]}
+      >
         Categorias
       </Text>
 
@@ -159,13 +154,20 @@ export default function PainelOpcoes({
               accessibilityLabel={categoria.nome}
               style={StyleSheet.flatten([
                 styles.linhaLink,
-                { top: y(topo - 6), width: x(270), height: y(34) },
+                { top: medida(topo - 6), width: medida(270), height: medida(34) },
               ])}
             >
-              <Text style={[styles.traco, { left: x(21), top: y(6), fontSize: y(18) }]}>—</Text>
+              <Text
+                style={[styles.traco, { left: medida(21), top: medida(6), fontSize: medida(18) }]}
+              >
+                —
+              </Text>
               <Text
                 numberOfLines={1}
-                style={[styles.textoItem, { left: x(55), top: y(6), width: x(210), fontSize: y(16) }]}
+                style={[
+                  styles.textoItem,
+                  { left: medida(55), top: medida(6), width: medida(210), fontSize: medida(16) },
+                ]}
               >
                 {categoria.nome}
               </Text>
@@ -181,14 +183,14 @@ export default function PainelOpcoes({
           accessibilityLabel="Nova Categoria"
           style={[
             styles.linhaMenu,
-            { left: x(8), top: y(topoNova), width: x(260), height: y(36) },
+            { left: medida(8), top: medida(topoNova), width: medida(260), height: medida(36) },
           ]}
         >
-          <Ionicons name="add" size={x(15)} color="#5C5C5C" />
+          <Ionicons name="add" size={medida(15)} color="#3A3A3A" />
           <Text
             style={[
               styles.textoSuave,
-              { position: 'relative', fontSize: y(14), marginLeft: x(10) },
+              { position: 'relative', fontSize: medida(14), marginLeft: medida(10) },
             ]}
           >
             Nova Categoria
@@ -196,7 +198,12 @@ export default function PainelOpcoes({
         </Pressable>
       ) : null}
 
-      <View style={[styles.divisor, { left: x(5), top: y(topoDivisor2), width: x(277) }]} />
+      <View
+        style={[
+          styles.divisor,
+          { left: medida(5), top: medida(topoDivisor2), width: medida(277) },
+        ]}
+      />
 
       {/* Link com asChild não aceita lista de estilos no filho, então o flatten
           junta tudo num objeto só. */}
@@ -206,14 +213,14 @@ export default function PainelOpcoes({
           accessibilityLabel="Configurações"
           style={StyleSheet.flatten([
             styles.linhaMenu,
-            { left: x(8), top: y(topoConfig), width: x(270), height: y(48) },
+            { left: medida(8), top: medida(topoConfig), width: medida(270), height: medida(48) },
           ])}
         >
-          <Ionicons name="settings-outline" size={x(26)} color="#1C1C1C" />
+          <Ionicons name="settings-outline" size={medida(26)} color="#1C1C1C" />
           <Text
             style={[
               styles.textoItem,
-              { position: 'relative', fontSize: y(18), marginLeft: x(12) },
+              { position: 'relative', fontSize: medida(18), marginLeft: medida(12) },
             ]}
           >
             Configurações
@@ -227,16 +234,18 @@ export default function PainelOpcoes({
           accessibilityLabel="Tarefas Concluídas"
           style={StyleSheet.flatten([
             styles.linhaLink,
-            { top: y(topoConcluidas - 10), width: x(270), height: y(46) },
+            { top: medida(topoConcluidas - 10), width: medida(270), height: medida(46) },
           ])}
         >
           <Ionicons
             name="checkmark-circle-outline"
-            size={x(26)}
+            size={medida(26)}
             color="#1C1C1C"
-            style={{ position: 'absolute', left: x(19), top: y(10) }}
+            style={{ position: 'absolute', left: medida(19), top: medida(10) }}
           />
-          <Text style={[styles.textoItem, { left: x(57), top: y(10), fontSize: y(18) }]}>
+          <Text
+            style={[styles.textoItem, { left: medida(57), top: medida(10), fontSize: medida(18) }]}
+          >
             Tarefas Concluídas
           </Text>
         </Pressable>
@@ -247,16 +256,18 @@ export default function PainelOpcoes({
           accessibilityLabel="Tarefas Excluídas"
           style={StyleSheet.flatten([
             styles.linhaLink,
-            { top: y(topoExcluidas - 10), width: x(270), height: y(46) },
+            { top: medida(topoExcluidas - 10), width: medida(270), height: medida(46) },
           ])}
         >
           <Ionicons
             name="trash-outline"
-            size={x(24)}
+            size={medida(24)}
             color="#1C1C1C"
-            style={{ position: 'absolute', left: x(17), top: y(10) }}
+            style={{ position: 'absolute', left: medida(17), top: medida(10) }}
           />
-          <Text style={[styles.textoItem, { left: x(55), top: y(10), fontSize: y(18) }]}>
+          <Text
+            style={[styles.textoItem, { left: medida(55), top: medida(10), fontSize: medida(18) }]}
+          >
             Tarefas Excluídas
           </Text>
         </Pressable>
@@ -273,8 +284,7 @@ export default function PainelOpcoes({
           aviso={avisoBolha}
           aoAdicionar={confirmarCategoria}
           aoCancelar={fecharBolha}
-          escalaX={escalaX}
-          escalaY={escalaY}
+          escala={escala}
           faltam={LIMITE_CATEGORIAS_NOVAS - novasJaCriadas}
         />
       ) : null}
@@ -290,9 +300,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     backgroundColor: '#D9D9D9',
   },
+  // Letras em negrito: a fonte fina sumia em cima do vidro.
   nomeUsuario: {
     position: 'absolute',
     color: '#1C1C1C',
+    fontWeight: '700',
   },
   divisor: {
     position: 'absolute',
@@ -302,14 +314,17 @@ const styles = StyleSheet.create({
   textoItem: {
     position: 'absolute',
     color: '#1C1C1C',
+    fontWeight: '700',
   },
   textoSuave: {
     position: 'absolute',
-    color: '#5C5C5C',
+    color: '#3A3A3A',
+    fontWeight: '600',
   },
   traco: {
     position: 'absolute',
     color: '#1C1C1C',
+    fontWeight: '700',
   },
   linhaMenu: {
     position: 'absolute',

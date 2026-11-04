@@ -4,8 +4,8 @@ import CardTarefa from './CardTarefa';
 // Lista de cards de tarefa (tela inicial e Calendário). FlatList da aula 02.
 // keyExtractor diz que o id identifica cada card. ListEmptyComponent aparece
 // quando não tem nenhuma tarefa.
-// Props: tarefas, tema, mensagemVazia, aoConcluir(id) e aoExcluir(id).
-export default function ListaCards({ tarefas, tema, mensagemVazia, aoConcluir, aoExcluir }) {
+// Props: tarefas, tema, mensagemVazia, aoConcluir(id) e aoEditar(id).
+export default function ListaCards({ tarefas, tema, mensagemVazia, aoConcluir, aoEditar }) {
   return (
     <FlatList
       data={tarefas}
@@ -20,8 +20,8 @@ export default function ListaCards({ tarefas, tema, mensagemVazia, aoConcluir, a
             aoConcluir={function () {
               aoConcluir(item.id);
             }}
-            aoExcluir={function () {
-              aoExcluir(item.id);
+            aoEditar={function () {
+              aoEditar(item.id);
             }}
           />
         );

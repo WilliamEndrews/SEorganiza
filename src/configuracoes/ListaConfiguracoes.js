@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 import Avatar from '../componentes/Avatar';
+import CabecalhoPagina from '../componentes/CabecalhoPagina';
 import GrupoVidro from '../componentes/GrupoVidro';
 import { BotaoConfig } from '../componentes/LinhasConfig';
 import { COR_ICONE_AZUL, COR_ICONE_LARANJA } from '../constantes/figma';
@@ -14,16 +15,9 @@ import { estilosConfig } from './estilosConfig';
 export default function ListaConfiguracoes({ nomeUsuario, aoVoltar }) {
   return (
     <View style={estilosConfig.configMiolo}>
-      {/* Tocar no título volta ao menu. O hitSlop aumenta a área de toque
-          de 40 para 44 px sem encostar na linha do perfil. */}
-      <Pressable
-        onPress={aoVoltar}
-        hitSlop={{ top: 4 }}
-        accessibilityRole="button"
-        accessibilityLabel="Voltar ao menu"
-      >
-        <Text style={estilosConfig.tituloConfig}>Configurações</Text>
-      </Pressable>
+      {/* O mesmo cabeçalho das páginas internas: a seta mostra onde tocar para
+          voltar ao menu. */}
+      <CabecalhoPagina titulo="Configurações" aoVoltar={aoVoltar} rotuloVoltar="Voltar ao menu" />
 
       {/* A linha do perfil abre a página Perfil. */}
       <Pressable

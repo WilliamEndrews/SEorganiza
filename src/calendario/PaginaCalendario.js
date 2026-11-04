@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Animated, Dimensions, Image, StyleSheet, View } from 'react-native';
+import { Animated, Image, StyleSheet, View, useWindowDimensions } from 'react-native';
 import CalendarioMes from './CalendarioMes';
 import ListaCards from '../componentes/ListaCards';
 import { useOpcoes } from '../contexto/OpcoesContext';
@@ -17,7 +17,7 @@ export default function PaginaCalendario({ tema }) {
     sairDoCalendario,
     tarefasAtivas,
     alternarConcluida,
-    excluirTarefa,
+    setIdEmEdicao,
     diaSelecionado,
     setDiaSelecionado,
   } = useOpcoes();
@@ -30,7 +30,7 @@ export default function PaginaCalendario({ tema }) {
   const diasComTarefa = tarefasAtivas.map(function (tarefa) {
     return tarefa.data;
   });
-  const tela = Dimensions.get('window');
+  const tela = useWindowDimensions();
 
   // Quando a página abre, o calendário desliza para dentro.
   // A lista vazia [] faz isso rodar uma vez só. O return roda quando a página
@@ -70,7 +70,7 @@ export default function PaginaCalendario({ tema }) {
           tema={tema}
           mensagemVazia="Nenhuma tarefa neste dia. Toque no + para criar uma."
           aoConcluir={alternarConcluida}
-          aoExcluir={excluirTarefa}
+          aoEditar={setIdEmEdicao}
         />
       </View>
     </Animated.View>

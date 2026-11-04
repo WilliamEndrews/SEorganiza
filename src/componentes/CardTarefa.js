@@ -3,15 +3,11 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
 // Card de uma tarefa (tela inicial e Calendário). As cores vêm do tema (dia ou noite).
-// Props (aula 01): tarefa, tema, aoConcluir (toque no círculo) e aoExcluir.
-// aoExcluir roda ao SEGURAR o card: o Figma não tem botão de excluir, então
-// usamos o toque longo. A tarefa vai para Tarefas Excluídas.
-export default function CardTarefa({ tarefa, tema, aoConcluir, aoExcluir }) {
+// Props (aula 01): tarefa, tema, aoConcluir (toque no círculo) e aoEditar.
+// aoEditar roda ao SEGURAR o card e abre a bolha para editar ou excluir.
+export default function CardTarefa({ tarefa, tema, aoConcluir, aoEditar }) {
   return (
-    <Pressable
-      onLongPress={aoExcluir}
-      accessibilityHint="Segure para mover a tarefa para Tarefas Excluídas"
-    >
+    <Pressable onLongPress={aoEditar} accessibilityHint="Segure para editar ou excluir a tarefa">
       <LinearGradient
         colors={tema.card}
         start={{ x: 0, y: 0 }}

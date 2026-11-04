@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Animated, Dimensions, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { Link, Stack, ThemeProvider, usePathname } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,7 +19,7 @@ import { TEMA_NAVEGACAO_TRANSPARENTE } from '../../constantes/navegacao';
 import { useOpcoes } from '../../contexto/OpcoesContext';
 import { animarPainel } from '../../utilidades/animarPainel';
 import PainelOpcoes from '../../menu/PainelOpcoes';
-import BolhaNovaTarefa from '../../inicio/BolhaNovaTarefa';
+import BolhaTarefa from '../../inicio/BolhaTarefa';
 import { dataDeHoje } from '../../utilidades/ajudantes';
 
 // Layout do grupo (principal) (aula 03 - Expo Router).
@@ -46,18 +46,29 @@ export default function LayoutPrincipal() {
     deslizeMenu: deslize,
     voltarAoInicio,
     adicionarTarefa,
+    editarTarefa,
+    excluirTarefa,
+    buscarTarefaPorId,
     diaSelecionado,
+    idEmEdicao,
+    setIdEmEdicao,
   } = useOpcoes();
-  const tela = Dimensions.get('window');
+  // Tamanho da tela. É como um estado: muda sozinho quando o tablet gira ou a
+  // janela do navegador muda de tamanho, e a tela desenha de novo.
+  const tela = useWindowDimensions();
   const tema = temaDoModo(modoTema);
   // usePathname dá o endereço atual. Serve para saber qual aba está ativa.
   const noCalendario = usePathname() === '/calendario';
   const escalaX = tela.width / TELA_LARGURA;
   const escalaY = tela.height / TELA_ALTURA;
-  const larguraPainel = PAINEL_LARGURA * escalaX;
-  const alturaPainel = PAINEL_ALTURA * escalaY;
-  const esquerdaPainel = PAINEL_X * escalaX;
-  const topoPainel = PAINEL_Y * escalaY;
+  // O menu usa uma escala só, a menor das duas. Assim no tablet ele fica igual
+  // ao do iPhone, só que maior, sem esticar os ícones e nunca passando da tela.
+  const escalaMenu = Math.min(escalaX, escalaY);
+  const larguraPainel = PAINEL_LARGURA * escalaMenu;
+  const alturaPainel = PAINEL_ALTURA * escalaMenu;
+  // Encostado na direita, com a mesma margem do Figma.
+  const esquerdaPainel = tela.width - (TELA_LARGURA - PAINEL_X) * escalaMenu;
+  const topoPainel = PAINEL_Y * escalaMenu;
 
   // Sempre que `aberto` vira true (daqui ou voltando das opções), o menu
   // entra deslizando.
@@ -86,37 +97,13 @@ export default function LayoutPrincipal() {
     outputRange: [esquerdaPainel, tela.width],
   });
 
-  // Bolha "Nova tarefa" do botão +. bolhaNaTela diz se ela aparece e
-  // aparecerBolha anima (0 = escondida, 1 = na tela).
+  // Bolha "Nova tarefa" do botão +. bolhaNaTela diz se ela aparece.
   // No Calendário a tarefa vai para o dia escolhido; na inicial, para hoje.
   const dataNova = noCalendario ? diaSelecionado : dataDeHoje();
   const [bolhaNaTela, setBolhaNaTela] = useState(false);
-  const [aparecerBolha] = useState(function () {
-    return new Animated.Value(0);
-  });
 
-  function abrirBolha() {
-    setBolhaNaTela(true);
-    aparecerBolha.setValue(0);
-    Animated.timing(aparecerBolha, {
-      toValue: 1,
-      duration: 320,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
-  }
-
-  // Só tira a bolha depois que a animação de saída acaba.
-  function fecharBolha() {
-    Animated.timing(aparecerBolha, {
-      toValue: 0,
-      duration: 220,
-      easing: Easing.in(Easing.cubic),
-      useNativeDriver: true,
-    }).start(function () {
-      setBolhaNaTela(false);
-    });
-  }
+  // Tarefa que o usuário segurou num card. undefined = nenhuma bolha de edição.
+  const tarefaEmEdicao = idEmEdicao === null ? undefined : buscarTarefaPorId(idEmEdicao);
 
   return (
     <LinearGradient colors={tema.fundo} locations={tema.posicoes} style={styles.tela}>
@@ -160,7 +147,9 @@ export default function LayoutPrincipal() {
           <View style={styles.areaAdicionar}>
             <Pressable
               style={styles.botaoAdicionar}
-              onPress={abrirBolha}
+              onPress={function () {
+                setBolhaNaTela(true);
+              }}
               accessibilityRole="button"
               accessibilityLabel="Nova tarefa"
             >
@@ -226,7 +215,7 @@ export default function LayoutPrincipal() {
             height: alturaPainel,
             left: deslocamento,
             top: topoPainel,
-            borderRadius: 22 * escalaX,
+            borderRadius: 22 * escalaMenu,
             pointerEvents: aberto ? 'auto' : 'none',
           },
         ]}
@@ -243,24 +232,41 @@ export default function LayoutPrincipal() {
           style={[styles.brilho, { pointerEvents: 'none' }]}
         />
         <PainelOpcoes
-          escalaX={escalaX}
-          escalaY={escalaY}
+          escala={escalaMenu}
           nomeUsuario={nomeUsuario}
           categorias={categorias}
           aoAdicionarCategoria={adicionarCategoria}
         />
       </Animated.View>
 
+      {/* A mesma bolha serve para criar (botão +) e para editar (segurar o card). */}
       {bolhaNaTela ? (
-        <BolhaNovaTarefa
-          aparecer={aparecerBolha}
+        <BolhaTarefa
           categorias={categorias}
           data={dataNova}
-          aoAdicionar={function (titulo, categoriaId) {
+          aoSalvar={function (titulo, categoriaId) {
             adicionarTarefa(titulo, categoriaId, dataNova);
-            fecharBolha();
           }}
-          aoFechar={fecharBolha}
+          aoFechar={function () {
+            setBolhaNaTela(false);
+          }}
+          escalaX={escalaX}
+          escalaY={escalaY}
+        />
+      ) : null}
+      {tarefaEmEdicao ? (
+        <BolhaTarefa
+          categorias={categorias}
+          tarefa={tarefaEmEdicao}
+          aoSalvar={function (titulo, categoriaId) {
+            editarTarefa(tarefaEmEdicao.id, titulo, categoriaId);
+          }}
+          aoExcluir={function () {
+            excluirTarefa(tarefaEmEdicao.id);
+          }}
+          aoFechar={function () {
+            setIdEmEdicao(null);
+          }}
           escalaX={escalaX}
           escalaY={escalaY}
         />

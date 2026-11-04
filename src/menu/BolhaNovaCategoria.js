@@ -12,15 +12,12 @@ export default function BolhaNovaCategoria({
   aviso,
   aoAdicionar,
   aoCancelar,
-  escalaX,
-  escalaY,
+  escala,
   faltam,
 }) {
-  function x(valor) {
-    return valor * escalaX;
-  }
-  function y(valor) {
-    return valor * escalaY;
+  // Mesma escala do menu, para a bolha não esticar no tablet.
+  function medida(valor) {
+    return valor * escala;
   }
 
   return (
@@ -46,9 +43,9 @@ export default function BolhaNovaCategoria({
           styles.bolhaVidro,
           vidro,
           {
-            left: x(18),
-            top: y(188),
-            width: x(252),
+            left: medida(18),
+            top: medida(188),
+            width: medida(252),
             opacity: aparecer,
             transform: [
               {
@@ -67,7 +64,7 @@ export default function BolhaNovaCategoria({
           end={{ x: 0.6, y: 1 }}
           style={[styles.brilho, { pointerEvents: 'none' }]}
         />
-        <Text style={[styles.tituloBolha, { fontSize: y(16) }]}>Nova categoria</Text>
+        <Text style={[styles.tituloBolha, { fontSize: medida(16) }]}>Nova categoria</Text>
         <TextInput
           value={nome}
           onChangeText={aoMudarNome}
@@ -76,7 +73,7 @@ export default function BolhaNovaCategoria({
           maxLength={20}
           autoFocus
           accessibilityLabel="Nome da categoria"
-          style={[styles.campoBolha, { fontSize: y(16), minHeight: y(44) }]}
+          style={[styles.campoBolha, { fontSize: medida(16), minHeight: medida(44) }]}
         />
         {aviso ? <Text style={styles.avisoBolha}>{aviso}</Text> : null}
         <Text style={styles.notaBolha}>
